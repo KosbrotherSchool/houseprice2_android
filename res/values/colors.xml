@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<color name="white">#FFFFFF</color>
+	<color name="light_blue">#CCF1FF</color>
+	<color name="text_gray">#525252</color>
+	<color name="line_gray">#ADAAAA</color>
+	<color name="text_red">#FF3657</color>
+	<color name="gray_background">#EDEDED</color>
+	
+	<color name="dark_slate_gray">#2F4F4F</color>
+	<color name="gray_2">#AFAFAF</color>
+	<color name="gray_1">#C0C0C0</color>
+	<color name="black">#151515</color>
+    <color name="light_black">#202020</color>
+	
+    <color name="info_window_pressed">#97E3FC</color>
+    
+    <color name="text_calculator">#FA5705</color>
+    
+    <color name="text_dialog">#F57200</color>
+</resources>
