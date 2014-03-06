@@ -4,11 +4,11 @@
     <string name="app_name">housefinder</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
-	
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
-    
+    <string name="about_us">本程式由 Kosbrother工作室 所開發,\n\n實價登錄資料取自\n內政部網站的開源資訊,\n若有任何建議或合作機會. \n\n請利用底下的"聯絡我們"與我們聯繫</string>
+
     <!-- Latitude, longitude format -->
     <string name="latitude_longitude">%1$.8f, %2$.8f</string>
-    
+
 </resources>

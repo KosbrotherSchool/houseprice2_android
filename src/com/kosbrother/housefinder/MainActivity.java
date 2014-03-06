@@ -104,8 +104,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private ImageButton nextImageButton;
 	private TextView titleTextView;
 	private ProgressBar titleProgressBar;
-//	private Button btnDistance;
-	
+	// private Button btnDistance;
+
 	private ActionBarDrawerToggle mDrawerToggle;
 	private DrawerLayout mDrawerLayout;
 	private ArrayList<Item> items = new ArrayList<Item>();
@@ -125,10 +125,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private ArrayList<MarkerOptions> mMarkers = new ArrayList<MarkerOptions>();
 	private int memorySize = 256;
 	private int mPage = 0;
-	
+
 	public static boolean isReSearch = true;
+
 	// private DatabaseHelper databaseHelper = null;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -146,9 +147,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 		titleTextView = (TextView) findViewById(R.id.title_text);
 		titleProgressBar = (ProgressBar) findViewById(R.id.title_progress);
 		btnLayerButton = (ImageButton) findViewById(R.id.image_btn_layers);
-		
+
 		setStartAndEndDate(crawlDateNum);
-		
+
 		btnFocusButton = (ImageButton) findViewById(R.id.image_btn_focus);
 		btnFocusButton.setOnClickListener(new OnClickListener()
 		{
@@ -158,7 +159,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 				getLocation(true, 1);
 			}
 		});
-		
+
 		distanceButton = (Button) findViewById(R.id.distance_button);
 		distanceButton.setText(Double.toString(km_dis) + "km");
 		distanceButton.setOnClickListener(new OnClickListener()
@@ -170,7 +171,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 				showSelectDistanceDialog();
 			}
 		});
-		
+
 		btnLayerButton.setOnClickListener(new OnClickListener()
 		{
 			@Override
@@ -219,7 +220,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 			}
 		});
-		
+
 		previousImageButton.setOnClickListener(new OnClickListener()
 		{
 			@Override
@@ -236,7 +237,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 					{
 						new addMarkerTask().execute();
 					} else
-					{	
+					{
 						setTitleText(mPage);
 						addCurrentLocationMarker();
 						addMarkerNoPrice(mPage);
@@ -384,9 +385,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 								{
 									startDate = startYear * 100 + startMonth;
 									endDate = endYear * 100 + endMonth;
-//									Toast.makeText(MainActivity.this,
-//											Integer.toString(startDate),
-//											Toast.LENGTH_SHORT).show();
+									// Toast.makeText(MainActivity.this,
+									// Integer.toString(startDate),
+									// Toast.LENGTH_SHORT).show();
 									dateButton.setText(Integer
 											.toString(startYear)
 											+ "/"
@@ -618,13 +619,13 @@ public class MainActivity extends SherlockFragmentActivity implements
 														.getLongitude();
 												AppConstants.currentLatLng = new LatLng(
 														geoLat, geoLong);
-//												mGoogleMap
-//														.animateCamera(CameraUpdateFactory
-//																.newLatLngZoom(
-//																		new LatLng(
-//																				AppConstants.currentLatLng.latitude,
-//																				AppConstants.currentLatLng.longitude),
-//																		16.0f));
+												// mGoogleMap
+												// .animateCamera(CameraUpdateFactory
+												// .newLatLngZoom(
+												// new LatLng(
+												// AppConstants.currentLatLng.latitude,
+												// AppConstants.currentLatLng.longitude),
+												// 16.0f));
 												getLocation(false, 1);
 											}
 											return true;
@@ -933,8 +934,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 			}
 
 			Datas.mEstates = HouseApi.getAroundAllByAreas(MainActivity.this,
-					km_dis, center_x, center_y, startDate, endDate, hpMinString,
-					hpMaxString, areaMinString, areaMaxString,
+					km_dis, center_x, center_y, startDate, endDate,
+					hpMinString, hpMaxString, areaMinString, areaMaxString,
 					groundTypeString, buildingTypeString);
 
 			return null;
@@ -1359,9 +1360,10 @@ public class MainActivity extends SherlockFragmentActivity implements
 						mDrawerLayout.closeDrawer(leftDrawer);
 						break;
 					case 4:
-						// Intent intent = new Intent(MainActivity.this,
-						// CalculatorActivity.class);
-						// startActivity(intent);
+						Intent intent2 = new Intent(MainActivity.this,
+								CalculatorActivity.class);
+						startActivity(intent2);
+						mDrawerLayout.closeDrawer(leftDrawer);
 						break;
 					case 6:
 						// setting activity
@@ -1371,9 +1373,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 						break;
 					case 7:
 						// about us
-						// Intent intent2 = new Intent(MainActivity.this,
-						// AboutUsActivity.class);
-						// startActivity(intent2);
+						 Intent intent3 = new Intent(MainActivity.this,
+						 AboutUsActivity.class);
+						 startActivity(intent3);
 						break;
 					default:
 						break;
@@ -1704,12 +1706,12 @@ public class MainActivity extends SherlockFragmentActivity implements
 	{
 		// TODO Auto-generated method stub
 		mGoogleMap.animateCamera(CameraUpdateFactory.newLatLng(arg0));
-		AppConstants.currentLatLng = arg0;	
+		AppConstants.currentLatLng = arg0;
 		mGoogleMap.clear();
 		addCurrentLocationMarker();
 		getLocation(false, 1);
 	}
-	
+
 	@Override
 	public void onBackPressed()
 	{
@@ -1774,7 +1776,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		}
 
 	}
-	
+
 	private void showSelectDistanceDialog()
 	{
 
@@ -1837,7 +1839,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 					{
 						if (km_dis != 0)
 						{
-							distanceButton.setText(Double.toString(km_dis) + "km");
+							distanceButton.setText(Double.toString(km_dis)
+									+ "km");
 							Setting.saveSetting(Setting.keyKmDistance,
 									Double.toString(km_dis), MainActivity.this);
 							getLocation(false, 0);
