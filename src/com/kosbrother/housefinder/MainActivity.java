@@ -1349,18 +1349,13 @@ public class MainActivity extends SherlockFragmentActivity implements
 					switch (position)
 					{
 					case 1:
-						// move to position
-						// CameraPosition cameraPosition = new
-						// CameraPosition.Builder()
-						// .target(Constants.currentLatLng).zoom(14)
-						// .build();
-						// googleMap.animateCamera(CameraUpdateFactory
-						// .newCameraPosition(cameraPosition));
+						getLocation(true, 1);
 						mDrawerLayout.closeDrawer(leftDrawer);
 						break;
 					case 2:
-						// filter dialog
-						// showFilterDialog();
+						Intent intent = new Intent();
+						intent.setClass(MainActivity.this, FilterActivity.class);
+						startActivity(intent);
 						mDrawerLayout.closeDrawer(leftDrawer);
 						break;
 					case 4:
