@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeMap;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.MemoryInfo;
@@ -74,6 +75,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.kosbrother.housefinder.api.HouseApi;
+import com.kosbrother.housefinder.entity.RealEstate;
 import com.kosbrother.housefinder.fragment.TransparentSupportMapFragment;
 
 public class MainActivity extends SherlockFragmentActivity implements
@@ -395,6 +397,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 											+ "~"
 											+ Integer.toString(endYear)
 											+ "/" + Integer.toString(endMonth));
+									maekKeyArray();
 									getLocation(false, 1);
 								}
 
@@ -528,6 +531,33 @@ public class MainActivity extends SherlockFragmentActivity implements
 				+ Integer.toString(month);
 
 		dateButton.setText(dateStartString + "~" + dateEndString);
+
+		maekKeyArray();
+	}
+
+	private void maekKeyArray()
+	{
+		Datas.mArrayKey.clear();
+		int startYear = startDate / 100;
+		int startMonth = startDate % 100;
+		int endYear = endDate / 100;
+		int endMonth = endDate % 100;
+
+		int num = (endYear - startYear) * 12 + (endMonth - startMonth);
+
+		for (int i = 0; i < num; i++)
+		{
+			String key = Integer.toString(endYear * 100 + endMonth);
+			Datas.mArrayKey.add(key);
+			if ((endMonth - 1) != 0)
+			{
+				endMonth = endMonth - 1;
+			} else
+			{
+				endYear = endYear - 1;
+				endMonth = 12;
+			}
+		}
 
 	}
 
@@ -804,31 +834,31 @@ public class MainActivity extends SherlockFragmentActivity implements
 				@Override
 				public boolean onMarkerClick(Marker marker)
 				{
-					// if (marker == null || marker.getTitle() == null)
-					// {
-					// // Toast.makeText(MainActivity.this, "marker null",
-					// Toast.LENGTH_SHORT).show();
-					// return true;
-					// }
-					//
-					// Intent intent = new Intent();
+					if (marker == null || marker.getTitle() == null)
+					{
+						Toast.makeText(MainActivity.this, "marker null",
+								Toast.LENGTH_SHORT).show();
+						return true;
+					}
+
+					Intent intent = new Intent();
 					// String monthKey = Datas.getKeyByPosition(mPager
 					// .getCurrentItem());
-					// intent.putExtra("MonthKey", monthKey);
-					// try
-					// {
-					// Log.i("RowNumber", marker.getTitle().trim());
-					// intent.putExtra("RowNumber",
-					// Integer.valueOf(marker.getTitle().trim()));
-					// } catch (Exception e)
-					// {
-					// // Toast.makeText(MainActivity.this, "marker error",
-					// Toast.LENGTH_SHORT).show();
-					// intent.putExtra("RowNumber", 1);
-					// }
-					//
-					// intent.setClass(MainActivity.this, DetailActivity.class);
-					// startActivity(intent);
+					intent.putExtra("MonthKey", "");
+					try
+					{
+						Log.i("RowNumber", marker.getTitle().trim());
+						intent.putExtra("RowNumber",
+								Integer.valueOf(marker.getTitle().trim()));
+					} catch (Exception e)
+					{
+						Toast.makeText(MainActivity.this, "marker error",
+								Toast.LENGTH_SHORT).show();
+						intent.putExtra("RowNumber", 1);
+					}
+
+					intent.setClass(MainActivity.this, DetailActivity.class);
+					startActivity(intent);
 					return true;
 				}
 			});
@@ -951,7 +981,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			{
 				mPage = 0;
 
-				// Datas.mEstatesMap = getRealEstatesMap(Datas.mEstates);
+				Datas.mEstatesMap = getRealEstatesMap(Datas.mEstates);
 				setTitleText(mPage);
 
 				if (getCurrentMemory() > memorySize)
@@ -972,6 +1002,33 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 		}
 
+	}
+
+	private TreeMap<String, ArrayList<RealEstate>> getRealEstatesMap(
+			ArrayList<RealEstate> realEstates)
+	{
+
+		TreeMap<String, ArrayList<RealEstate>> estateMap = new TreeMap<String, ArrayList<RealEstate>>();
+		for (int i = 0; i < realEstates.size(); i++)
+		{
+			RealEstate realEstate = realEstates.get(i);
+			String realEstateKey = Integer.toString(realEstate.exchange_date);
+			// 先確認key是否存在
+			if (estateMap.containsKey(realEstateKey))
+			{
+				// 已經有的話就把movie加進去
+				((ArrayList<RealEstate>) estateMap.get(realEstateKey))
+						.add(realEstate);
+			} else
+			{
+				// 沒有的話就建一個加進去
+				ArrayList<RealEstate> newRealEstateList = new ArrayList<RealEstate>(
+						10);
+				newRealEstateList.add(realEstate);
+				estateMap.put(realEstateKey, newRealEstateList);
+			}
+		}
+		return estateMap;
 	}
 
 	private void showProgress()
@@ -1373,9 +1430,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 						break;
 					case 7:
 						// about us
-						 Intent intent3 = new Intent(MainActivity.this,
-						 AboutUsActivity.class);
-						 startActivity(intent3);
+						Intent intent3 = new Intent(MainActivity.this,
+								AboutUsActivity.class);
+						startActivity(intent3);
 						break;
 					default:
 						break;
