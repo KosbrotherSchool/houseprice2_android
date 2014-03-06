@@ -46,6 +46,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 import at.bartinger.list.item.EntryAdapter;
@@ -102,7 +104,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private ImageButton nextImageButton;
 	private TextView titleTextView;
 	private ProgressBar titleProgressBar;
-
+//	private Button btnDistance;
+	
 	private ActionBarDrawerToggle mDrawerToggle;
 	private DrawerLayout mDrawerLayout;
 	private ArrayList<Item> items = new ArrayList<Item>();
@@ -135,11 +138,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 		km_dis = Double
 				.valueOf(Setting.getSetting(Setting.keyKmDistance, this));
 		crawlDateNum = Setting.getCurrentDateNum(this);
-
 		housePriceChangeingTextView = (TextView) findViewById(R.id.house_price_changing_text);
 		housePriceLisTextView = (TextView) findViewById(R.id.house_price_data_list_text);
 		dateButton = (Button) findViewById(R.id.button_date);
-		distanceButton = (Button) findViewById(R.id.button_distance);
 		previousImageButton = (ImageButton) findViewById(R.id.previous_img_button);
 		nextImageButton = (ImageButton) findViewById(R.id.next_img_button);
 		titleTextView = (TextView) findViewById(R.id.title_text);
@@ -155,6 +156,18 @@ public class MainActivity extends SherlockFragmentActivity implements
 			public void onClick(View v)
 			{
 				getLocation(true, 1);
+			}
+		});
+		
+		distanceButton = (Button) findViewById(R.id.distance_button);
+		distanceButton.setText(Double.toString(km_dis) + "km");
+		distanceButton.setOnClickListener(new OnClickListener()
+		{
+
+			@Override
+			public void onClick(View v)
+			{
+				showSelectDistanceDialog();
 			}
 		});
 		
@@ -387,16 +400,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 							}
 						});
 				dialog.show();
-			}
-		});
-
-		distanceButton.setOnClickListener(new OnClickListener()
-		{
-
-			@Override
-			public void onClick(View v)
-			{
-
 			}
 		});
 
@@ -1775,6 +1778,90 @@ public class MainActivity extends SherlockFragmentActivity implements
 			isReSearch = true;
 		}
 
+	}
+	
+	private void showSelectDistanceDialog()
+	{
+
+		AlertDialog.Builder editDialog = new AlertDialog.Builder(
+				MainActivity.this);
+		editDialog.setTitle("選取搜索範圍");
+
+		// final EditText editText = new EditText(ArticleActivity.this);
+		// editDialog.setView(editText);
+
+		LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
+		View distance_view = inflater.inflate(R.layout.dialog_select_distance,
+				null);
+		final TextView textDistance = (TextView) distance_view
+				.findViewById(R.id.text_distance);
+		SeekBar seekBarDistance = (SeekBar) distance_view
+				.findViewById(R.id.seekbar_distance);
+
+		textDistance.setText(Double.toString(km_dis) + "km");
+		int pp = (int) (km_dis / 0.03);
+		seekBarDistance.setProgress(pp);
+
+		seekBarDistance
+				.setOnSeekBarChangeListener(new OnSeekBarChangeListener()
+				{
+
+					@Override
+					public void onStopTrackingTouch(SeekBar seekBar)
+					{
+						// TODO Auto-generated method stub
+
+					}
+
+					@Override
+					public void onStartTrackingTouch(SeekBar seekBar)
+					{
+						// TODO Auto-generated method stub
+
+					}
+
+					@Override
+					public void onProgressChanged(SeekBar seekBar,
+							int progress, boolean fromUser)
+					{
+						// TODO Auto-generated method stub
+						double d = progress * 0.03;
+						String d_String = Double.toString(d).substring(0, 3);
+
+						textDistance.setText(d_String + "km");
+						km_dis = Double.valueOf(d_String);
+					}
+				});
+
+		editDialog.setView(distance_view);
+
+		editDialog.setPositiveButton("確定",
+				new DialogInterface.OnClickListener()
+				{
+					public void onClick(DialogInterface arg0, int arg1)
+					{
+						if (km_dis != 0)
+						{
+							distanceButton.setText(Double.toString(km_dis) + "km");
+							Setting.saveSetting(Setting.keyKmDistance,
+									Double.toString(km_dis), MainActivity.this);
+							getLocation(false, 0);
+						} else
+						{
+							Toast.makeText(MainActivity.this, "半徑不能為0",
+									Toast.LENGTH_SHORT).show();
+						}
+
+					}
+				});
+		editDialog.setNegativeButton("取消",
+				new DialogInterface.OnClickListener()
+				{
+					public void onClick(DialogInterface arg0, int arg1)
+					{
+					}
+				});
+		editDialog.show();
 	}
 
 	// public DatabaseHelper getHelper()
