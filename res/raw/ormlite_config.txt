@@ -1,0 +1,48 @@
+#
+# generated on 2014/03/05 05:21:55
+#
+# --table-start--
+dataClass=com.kosbrother.housefinder.data.OrmRealEstate
+tableName=ormrealestate
+# --table-fields-start--
+# --field-start--
+fieldName=id
+generatedId=true
+# --field-end--
+# --field-start--
+fieldName=estate_id
+columnName=estate_id
+# --field-end--
+# --field-start--
+fieldName=estate_group
+# --field-end--
+# --field-start--
+fieldName=estate_address
+# --field-end--
+# --field-start--
+fieldName=exchange_date
+# --field-end--
+# --field-start--
+fieldName=total_price
+# --field-end--
+# --field-start--
+fieldName=square_price
+# --field-end--
+# --field-start--
+fieldName=total_area
+# --field-end--
+# --field-start--
+fieldName=x_long
+# --field-end--
+# --field-start--
+fieldName=y_lat
+# --field-end--
+# --field-start--
+fieldName=ground_type_id
+# --field-end--
+# --field-start--
+fieldName=building_type_id
+# --field-end--
+# --table-fields-end--
+# --table-end--
+#################################

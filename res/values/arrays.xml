@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="list_sort">
+        <item>單價(低->高)</item>
+        <item>單價(高->低)</item>
+        <item>總價(低->高)</item>
+        <item>總價(高->低)</item>
+        <item>坪數(低->高)</item>
+        <item>坪數(高->低)</item>
+        <item>交易日期(新到舊)</item>      
+    </string-array>
+    <string-array name="map_type">
+        <item>正常</item>
+        <item>衛星</item>
+        <item>綜合地圖</item>
+    </string-array>
+</resources>
