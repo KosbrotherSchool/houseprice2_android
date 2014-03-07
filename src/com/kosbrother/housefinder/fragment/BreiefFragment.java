@@ -129,30 +129,6 @@ public class BreiefFragment extends Fragment
 	}
 	
 	
-//	public boolean changeToDetailView()
-//	{
-//		if (layoutBrief.getVisibility() == View.VISIBLE)
-//		{
-//			layoutBrief.setVisibility(View.GONE);
-//			layoutDetailView.setVisibility(View.VISIBLE);
-//			return true;
-//		}else {
-//			layoutBrief.setVisibility(View.VISIBLE);
-//			layoutDetailView.setVisibility(View.GONE);
-//			return false;
-//		}		
-//	}
-	
-//	public void showBrief(){
-//		layoutBrief.setVisibility(View.VISIBLE);
-//		layoutDetailView.setVisibility(View.GONE);
-//	}
-//	
-//	public void showDetail(){
-//		layoutBrief.setVisibility(View.VISIBLE);
-//		layoutDetailView.setVisibility(View.GONE);
-//	}
-	
 	public void addDetailViews()
 	{	
 	

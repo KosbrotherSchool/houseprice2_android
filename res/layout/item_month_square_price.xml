@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+         >
+
+        <TextView
+            android:id="@+id/price_month_year_text"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:text="102/01"
+            android:textColor="@color/white" />
+
+        <TextView
+            android:id="@+id/price_month_high_text"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:text="101.3萬"
+            android:textColor="@color/white" />
+
+        <TextView
+            android:id="@+id/price_month_avg_text"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:text="24.5萬"
+            android:textColor="@color/white" />
+
+        <TextView
+            android:id="@+id/price_month_change_text"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:text="漲5%"
+            android:textColor="@color/white" />
+
+        <TextView
+            android:id="@+id/price_month_low_text"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:text="13萬"
+            android:textColor="@color/white" />
+
+        <TextView
+            android:id="@+id/price_month_quantity_text"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:text="20筆"
+            android:textColor="@color/white" />
+    </LinearLayout>
+
+</LinearLayout>

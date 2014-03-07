@@ -413,8 +413,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 			@Override
 			public void onClick(View v)
 			{
-				// TODO Auto-generated method stub
-
+				Intent intent = new Intent();
+				intent.setClass(MainActivity.this, MonthPriceChangeActivity.class);
+				startActivity(intent);
 			}
 		});
 
