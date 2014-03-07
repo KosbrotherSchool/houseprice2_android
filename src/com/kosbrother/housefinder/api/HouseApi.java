@@ -34,7 +34,7 @@ public class HouseApi
 	public static final boolean DEBUG = true;
 
 	public static ArrayList<RealEstate> getAroundAllByAreas(
-			MainActivity mActivity, double km_dis, double center_x,
+			double km_dis, double center_x,
 			double center_y, int start_date, int end_date, String hp_min,
 			String hp_max, String area_min, String area_max,
 			String groundTypeString, String buildingTypeString)

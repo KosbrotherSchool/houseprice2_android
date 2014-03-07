@@ -86,12 +86,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private LocationClient mLocationClient;
 	private GoogleMap mGoogleMap;
 
-	private double km_dis;
-	private double center_x;
-	private double center_y;
+	// private double center_x;
+	// private double center_y;
 	private float mapSize;
-	private int startDate;
-	private int endDate;
 
 	private MenuItem itemSearch;
 	private static final int ID_SEARCH = 5;
@@ -125,11 +122,12 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private boolean isEstatesTaskRunning = false;
 
 	private ArrayList<MarkerOptions> mMarkers = new ArrayList<MarkerOptions>();
-	private int memorySize = 256;
+	// private int memorySize = 256;
 	private int mPage = 0;
 
 	public static boolean isReSearch = true;
-
+	public static boolean isResetView = false;
+	
 	// private DatabaseHelper databaseHelper = null;
 
 	@Override
@@ -138,8 +136,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.drawer_layout);
 
-		km_dis = Double
-				.valueOf(Setting.getSetting(Setting.keyKmDistance, this));
+		AppConstants.km_dis = Double.valueOf(Setting.getSetting(
+				Setting.keyKmDistance, this));
 		crawlDateNum = Setting.getCurrentDateNum(this);
 		housePriceChangeingTextView = (TextView) findViewById(R.id.house_price_changing_text);
 		housePriceLisTextView = (TextView) findViewById(R.id.house_price_data_list_text);
@@ -163,7 +161,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		});
 
 		distanceButton = (Button) findViewById(R.id.distance_button);
-		distanceButton.setText(Double.toString(km_dis) + "km");
+		distanceButton.setText(Double.toString(AppConstants.km_dis) + "km");
 		distanceButton.setOnClickListener(new OnClickListener()
 		{
 
@@ -235,15 +233,15 @@ public class MainActivity extends SherlockFragmentActivity implements
 				} else
 				{
 					mPage = mPage - 1;
-					if (getCurrentMemory() > memorySize)
-					{
-						new addMarkerTask().execute();
-					} else
-					{
-						setTitleText(mPage);
-						addCurrentLocationMarker();
-						addMarkerNoPrice(mPage);
-					}
+					// if (getCurrentMemory() > memorySize)
+					// {
+					new addMarkerTask().execute();
+					// } else
+					// {
+					// setTitleText(mPage);
+					// addCurrentLocationMarker();
+					// addMarkerNoPrice(mPage);
+					// }
 				}
 
 			}
@@ -262,15 +260,15 @@ public class MainActivity extends SherlockFragmentActivity implements
 				} else
 				{
 					mPage = mPage + 1;
-					if (getCurrentMemory() > memorySize)
-					{
-						new addMarkerTask().execute();
-					} else
-					{
-						setTitleText(mPage);
-						addCurrentLocationMarker();
-						addMarkerNoPrice(mPage);
-					}
+					// if (getCurrentMemory() > memorySize)
+					// {
+					new addMarkerTask().execute();
+					// } else
+					// {
+					// setTitleText(mPage);
+					// addCurrentLocationMarker();
+					// addMarkerNoPrice(mPage);
+					// }
 				}
 
 			}
@@ -301,14 +299,14 @@ public class MainActivity extends SherlockFragmentActivity implements
 				final EditText endMonthEditText = (EditText) layout
 						.findViewById(R.id.end_month_edittext);
 
-				int startYear = startDate / 100;
-				int startMonth = startDate % 100;
+				int startYear = AppConstants.startDate / 100;
+				int startMonth = AppConstants.startDate % 100;
 
 				startYearEditText.setHint(Integer.toString(startYear));
 				startMonthEditText.setHint(Integer.toString(startMonth));
 
-				int endYear = endDate / 100;
-				int endMonth = endDate % 100;
+				int endYear = AppConstants.endDate / 100;
+				int endMonth = AppConstants.endDate % 100;
 
 				endYearEditText.setHint(Integer.toString(endYear));
 				endMonthEditText.setHint(Integer.toString(endMonth));
@@ -331,7 +329,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 									DialogInterface dialoginterface, int i)
 							{
 
-								int startYear = startDate / 100;
+								int startYear = AppConstants.startDate / 100;
 								try
 								{
 									startYear = Integer
@@ -342,7 +340,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 									// TODO: handle exception
 								}
 
-								int startMonth = startDate % 100;
+								int startMonth = AppConstants.startDate % 100;
 								try
 								{
 									startMonth = Integer
@@ -353,7 +351,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 									// TODO: handle exception
 								}
 
-								int endYear = endDate / 100;
+								int endYear = AppConstants.endDate / 100;
 								try
 								{
 									endYear = Integer.valueOf(endYearEditText
@@ -363,7 +361,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 									// TODO: handle exception
 								}
 
-								int endMonth = endDate % 100;
+								int endMonth = AppConstants.endDate % 100;
 								try
 								{
 									endMonth = Integer.valueOf(endMonthEditText
@@ -385,8 +383,10 @@ public class MainActivity extends SherlockFragmentActivity implements
 											.show();
 								} else
 								{
-									startDate = startYear * 100 + startMonth;
-									endDate = endYear * 100 + endMonth;
+									AppConstants.startDate = startYear * 100
+											+ startMonth;
+									AppConstants.endDate = endYear * 100
+											+ endMonth;
 									// Toast.makeText(MainActivity.this,
 									// Integer.toString(startDate),
 									// Toast.LENGTH_SHORT).show();
@@ -424,8 +424,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 			@Override
 			public void onClick(View v)
 			{
-				// TODO Auto-generated method stub
-
+				Intent intent = new Intent();
+				intent.setClass(MainActivity.this, ListActivity.class);
+				startActivity(intent);
 			}
 		});
 
@@ -521,8 +522,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 			}
 		}
 
-		startDate = startYear * 100 + startMonth;
-		endDate = crawlDateNum;
+		AppConstants.startDate = startYear * 100 + startMonth;
+		AppConstants.endDate = crawlDateNum;
 
 		String dateStartString = Integer.toString(startYear) + "/"
 				+ Integer.toString(startMonth);
@@ -538,12 +539,12 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private void maekKeyArray()
 	{
 		Datas.mArrayKey.clear();
-		int startYear = startDate / 100;
-		int startMonth = startDate % 100;
-		int endYear = endDate / 100;
-		int endMonth = endDate % 100;
+		int startYear = AppConstants.startDate / 100;
+		int startMonth = AppConstants.startDate % 100;
+		int endYear = AppConstants.endDate / 100;
+		int endMonth = AppConstants.endDate % 100;
 
-		int num = (endYear - startYear) * 12 + (endMonth - startMonth);
+		int num = (endYear - startYear) * 12 + (endMonth - startMonth) + 1;
 
 		for (int i = 0; i < num; i++)
 		{
@@ -708,15 +709,51 @@ public class MainActivity extends SherlockFragmentActivity implements
 	@Override
 	public void onDisconnected()
 	{
-		// TODO Auto-generated method stub
 
 	}
+	
+	@Override
+	protected void onResume()
+	{
+		super.onResume();
+		if (isResetView)
+		{
+			reSetViews();
+			isResetView = false;
+		}
+	}
+	
+	private void reSetViews()
+	{
+		// set distance button
+		distanceButton.setText(Double.toString(AppConstants.km_dis) + "km");
+		// set date button
+		setDateButtonText();
+		// set title text
+		mPage = 0;
+		setTitleText(mPage);
+		// set map marker
+		new addMarkerTask().execute();
+	}
+	
+	private void setDateButtonText()
+	{
+		int startYear = AppConstants.startDate / 100;
+		int startMonth = AppConstants.startDate % 100;
 
+		int endYear = AppConstants.endDate / 100;
+		int endMonth = AppConstants.endDate % 100;
+
+		dateButton.setText(Integer.toString(startYear) + "/"
+				+ Integer.toString(startMonth) + "~"
+				+ Integer.toString(endYear) + "/" + Integer.toString(endMonth));
+
+	}
+	
 	@Override
 	public void onLocationChanged(Location arg0)
 	{
-		// TODO Auto-generated method stub
-
+	
 	}
 
 	@Override
@@ -790,21 +827,23 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 			if (!isNeedChangeMap)
 			{
-				center_x = AppConstants.currentLatLng.longitude;
-				center_y = AppConstants.currentLatLng.latitude;
+				// center_x = AppConstants.currentLatLng.longitude;
+				// center_y = AppConstants.currentLatLng.latitude;
 
 				mapSize = 15.0f;
 
-				if (0 < km_dis && km_dis <= 0.3)
+				if (0 < AppConstants.km_dis && AppConstants.km_dis <= 0.3)
 				{
 					mapSize = 16.0f;
-				} else if (0.3 < km_dis && km_dis <= 0.5)
+				} else if (0.3 < AppConstants.km_dis
+						&& AppConstants.km_dis <= 0.5)
 				{
 					mapSize = 15.0f;
-				} else if (0.5 < km_dis && km_dis <= 1)
+				} else if (0.5 < AppConstants.km_dis
+						&& AppConstants.km_dis <= 1)
 				{
 					mapSize = 14.0f;
-				} else if (1 < km_dis && km_dis <= 2)
+				} else if (1 < AppConstants.km_dis && AppConstants.km_dis <= 2)
 				{
 					mapSize = 13.0f;
 				} else
@@ -963,9 +1002,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 				buildingTypeString = null;
 			}
 
-			Datas.mEstates = HouseApi.getAroundAllByAreas(MainActivity.this,
-					km_dis, center_x, center_y, startDate, endDate,
-					hpMinString, hpMaxString, areaMinString, areaMaxString,
+			Datas.mEstates = HouseApi.getAroundAllByAreas(AppConstants.km_dis,
+					AppConstants.currentLatLng.longitude,
+					AppConstants.currentLatLng.latitude,
+					AppConstants.startDate, AppConstants.endDate, hpMinString,
+					hpMaxString, areaMinString, areaMaxString,
 					groundTypeString, buildingTypeString);
 
 			return null;
@@ -984,14 +1025,14 @@ public class MainActivity extends SherlockFragmentActivity implements
 				Datas.mEstatesMap = getRealEstatesMap(Datas.mEstates);
 				setTitleText(mPage);
 
-				if (getCurrentMemory() > memorySize)
-				{
-					new addMarkerTask().execute();
-				} else
-				{
-					addCurrentLocationMarker();
-					addMarkerNoPrice(0);
-				}
+				// if (getCurrentMemory() > memorySize)
+				// {
+				new addMarkerTask().execute();
+				// } else
+				// {
+				// addCurrentLocationMarker();
+				// addMarkerNoPrice(0);
+				// }
 
 			} else
 			{
@@ -1852,8 +1893,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 		SeekBar seekBarDistance = (SeekBar) distance_view
 				.findViewById(R.id.seekbar_distance);
 
-		textDistance.setText(Double.toString(km_dis) + "km");
-		int pp = (int) (km_dis / 0.03);
+		textDistance.setText(Double.toString(AppConstants.km_dis) + "km");
+		int pp = (int) (AppConstants.km_dis / 0.03);
 		seekBarDistance.setProgress(pp);
 
 		seekBarDistance
@@ -1883,7 +1924,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 						String d_String = Double.toString(d).substring(0, 3);
 
 						textDistance.setText(d_String + "km");
-						km_dis = Double.valueOf(d_String);
+						AppConstants.km_dis = Double.valueOf(d_String);
 					}
 				});
 
@@ -1894,12 +1935,13 @@ public class MainActivity extends SherlockFragmentActivity implements
 				{
 					public void onClick(DialogInterface arg0, int arg1)
 					{
-						if (km_dis != 0)
+						if (AppConstants.km_dis != 0)
 						{
-							distanceButton.setText(Double.toString(km_dis)
-									+ "km");
+							distanceButton.setText(Double
+									.toString(AppConstants.km_dis) + "km");
 							Setting.saveSetting(Setting.keyKmDistance,
-									Double.toString(km_dis), MainActivity.this);
+									Double.toString(AppConstants.km_dis),
+									MainActivity.this);
 							getLocation(false, 0);
 						} else
 						{

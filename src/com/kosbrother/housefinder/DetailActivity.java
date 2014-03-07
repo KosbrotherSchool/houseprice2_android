@@ -92,7 +92,7 @@ public class DetailActivity extends SherlockFragmentActivity
 			}
 		});
 
-		CallAds();
+//		CallAds();
 	}
 
 	public class MyAdapter extends FragmentStatePagerAdapter
