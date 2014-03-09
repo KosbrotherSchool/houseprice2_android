@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -25,13 +26,15 @@ import com.kosbrother.housefinder.Datas;
 import com.kosbrother.housefinder.DetailActivity;
 import com.kosbrother.housefinder.R;
 import com.kosbrother.housefinder.Setting;
+import com.kosbrother.housefinder.adapter.DetailListAdapter;
 import com.kosbrother.housefinder.api.InfoParserApi;
 import com.kosbrother.housefinder.entity.RealEstate;
 
 public class BreiefFragment extends Fragment
 {
 
-	private TableLayout detailTableLayout;
+//	private TableLayout detailTableLayout;
+	private ListView detailListView;
 	private LinearLayout layoutBrief;
 	private View layoutDetailView;
 	private int mPosition;
@@ -68,7 +71,7 @@ public class BreiefFragment extends Fragment
 		textEstateSquarePrice = (TextView) v.findViewById(R.id.text_estate_square_price);
 		textSquarePriceChange = (TextView) v.findViewById(R.id.text_square_price_change);
 
-		detailTableLayout = (TableLayout) v.findViewById(R.id.detail_talble);
+		detailListView = (ListView) v.findViewById(R.id.listview_detail);
 		Bundle bundle = getArguments();
 		mPosition = bundle.getInt("num");
 		
@@ -131,105 +134,109 @@ public class BreiefFragment extends Fragment
 	
 	public void addDetailViews()
 	{	
-	
-		detailTableLayout.removeAllViews();
 		ArrayList<RealEstate> theEstates = new ArrayList<RealEstate>();
 		theEstates = Datas.mEstatesMap.get(Datas.getKeyByPosition(mPosition));
-
-		for (int i = 0; i < theEstates.size(); i++)
-		{
-
-			final TableRow newTableRow = new TableRow(getActivity());
-			newTableRow.setGravity(Gravity.CENTER_HORIZONTAL);
-			// newTableRow.setWeightSum(7);
-			if (rowHight == 0)
-			{
-				rowHight =(int) AppConstants.convertDpToPixel(36, getActivity());
-			}
+		DetailListAdapter newAdapter = new DetailListAdapter(getActivity(), theEstates, mPosition);
+		detailListView.setAdapter(newAdapter);
+		
+//		detailTableLayout.removeAllViews();
+//		ArrayList<RealEstate> theEstates = new ArrayList<RealEstate>();
+//		theEstates = Datas.mEstatesMap.get(Datas.getKeyByPosition(mPosition));
+//
+//		for (int i = 0; i < theEstates.size(); i++)
+//		{
+//
+//			final TableRow newTableRow = new TableRow(getActivity());
+//			newTableRow.setGravity(Gravity.CENTER_HORIZONTAL);
+//			// newTableRow.setWeightSum(7);
+//			if (rowHight == 0)
+//			{
+//				rowHight =(int) AppConstants.convertDpToPixel(36, getActivity());
+//			}
+////			
+////			TableRow.LayoutParams tlparams = new TableRow.LayoutParams(
+////					TableRow.LayoutParams.WRAP_CONTENT, rowHight);
+////			newTableRow.setLayoutParams(tlparams);
 //			
-//			TableRow.LayoutParams tlparams = new TableRow.LayoutParams(
-//					TableRow.LayoutParams.WRAP_CONTENT, rowHight);
-//			newTableRow.setLayoutParams(tlparams);
-			
-			String year = Integer.toString(theEstates.get(i).exchange_date/100);
-			String month = Integer.toString(theEstates.get(i).exchange_date % 100);
-
-			TextView tDateView = new TextView(getActivity());
-			tDateView.setText(year + "/" + month);
-			tDateView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
-			tDateView.setLayoutParams(new TableRow.LayoutParams(0, rowHight, 1f));
-			newTableRow.addView(tDateView);
-
-			int groundTypeId = theEstates.get(i).ground_type_id;
-			String groundType = InfoParserApi.parseGroundType(groundTypeId);
-			TextView tBuyTypeView = new TextView(getActivity());
-			tBuyTypeView.setText(groundType);
-			tBuyTypeView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
-			tBuyTypeView.setLayoutParams(new TableRow.LayoutParams(0, rowHight, 1f));
-			newTableRow.addView(tBuyTypeView);
-
-			int buildingTypeId = theEstates.get(i).building_type_id;
-			String buildType = InfoParserApi.parseBuildingType(buildingTypeId);
-			TextView tBuildingView = new TextView(getActivity());
-			tBuildingView.setText(buildType);
-			tBuildingView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
-			tBuildingView.setLayoutParams(new TableRow.LayoutParams(0, rowHight, 1f));
-			newTableRow.addView(tBuildingView);
-
-			TextView tTotalPriceView = new TextView(getActivity());
-			tTotalPriceView.setText(Integer.toString(theEstates.get(i).total_price));
-			tTotalPriceView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
-			tTotalPriceView.setLayoutParams(new TableRow.LayoutParams(0, rowHight, 1f));
-			newTableRow.addView(tTotalPriceView);
-
-			TextView tSquarePriceView = new TextView(getActivity());
-			tSquarePriceView.setText(Double.toString(theEstates.get(i).square_price));
-			tSquarePriceView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
-			tSquarePriceView.setLayoutParams(new TableRow.LayoutParams(0, rowHight, 1f));
-			newTableRow.addView(tSquarePriceView);
-
-			TextView tArea = new TextView(getActivity());
-			tArea.setText(Double.toString(theEstates.get(i).total_area));
-			tArea.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
-			tArea.setLayoutParams(new TableRow.LayoutParams(0, rowHight, 1f));
-			newTableRow.setTag(i);
-			newTableRow.addView(tArea);
-			
-			if (i%2 == 1)
-			{	
-				newTableRow.setBackgroundResource(R.drawable.table_row_odd_selector);
-//				newTableRow.setBackground(getResources().getDrawable(R.drawable.table_row_odd_selector));
-			}else {
-				newTableRow.setBackgroundResource(R.drawable.table_row_even_selector);
-//				newTableRow.setBackground(getResources().getDrawable(R.drawable.table_row_even_selector));
-			}
-			
-
-			newTableRow.setOnClickListener(new OnClickListener()
-			{
-
-				@Override
-				public void onClick(View v)
-				{
-					// Toast.makeText(getActivity(), "row click",
-					// Toast.LENGTH_SHORT).show();
-					Intent intent = new Intent();
-					intent.putExtra("MonthKey", Datas.getKeyByPosition(mPosition));
-					intent.putExtra("RowNumber", Integer.valueOf(newTableRow.getTag().toString()));
-					intent.setClass(getActivity(), DetailActivity.class);
-					startActivity(intent);
-				}
-			});
-
-			// TextView tRoomsView = new TextView(getActivity());
-			// tRoomsView.setText("3/2/1");
-			// tRoomsView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.TOP);
-			// tRoomsView.setLayoutParams(new TableRow.LayoutParams(0, 40, 1f));
-			// newTableRow.addView(tRoomsView);
-
-			detailTableLayout.addView(newTableRow);
-
-		}
+//			String year = Integer.toString(theEstates.get(i).exchange_date/100);
+//			String month = Integer.toString(theEstates.get(i).exchange_date % 100);
+//
+//			TextView tDateView = new TextView(getActivity());
+//			tDateView.setText(year + "/" + month);
+//			tDateView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
+//			tDateView.setLayoutParams(new TableRow.LayoutParams(0, rowHight, 1f));
+//			newTableRow.addView(tDateView);
+//
+//			int groundTypeId = theEstates.get(i).ground_type_id;
+//			String groundType = InfoParserApi.parseGroundType(groundTypeId);
+//			TextView tBuyTypeView = new TextView(getActivity());
+//			tBuyTypeView.setText(groundType);
+//			tBuyTypeView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
+//			tBuyTypeView.setLayoutParams(new TableRow.LayoutParams(0, rowHight, 1f));
+//			newTableRow.addView(tBuyTypeView);
+//
+//			int buildingTypeId = theEstates.get(i).building_type_id;
+//			String buildType = InfoParserApi.parseBuildingType(buildingTypeId);
+//			TextView tBuildingView = new TextView(getActivity());
+//			tBuildingView.setText(buildType);
+//			tBuildingView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
+//			tBuildingView.setLayoutParams(new TableRow.LayoutParams(0, rowHight, 1f));
+//			newTableRow.addView(tBuildingView);
+//
+//			TextView tTotalPriceView = new TextView(getActivity());
+//			tTotalPriceView.setText(Integer.toString(theEstates.get(i).total_price));
+//			tTotalPriceView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
+//			tTotalPriceView.setLayoutParams(new TableRow.LayoutParams(0, rowHight, 1f));
+//			newTableRow.addView(tTotalPriceView);
+//
+//			TextView tSquarePriceView = new TextView(getActivity());
+//			tSquarePriceView.setText(Double.toString(theEstates.get(i).square_price));
+//			tSquarePriceView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
+//			tSquarePriceView.setLayoutParams(new TableRow.LayoutParams(0, rowHight, 1f));
+//			newTableRow.addView(tSquarePriceView);
+//
+//			TextView tArea = new TextView(getActivity());
+//			tArea.setText(Double.toString(theEstates.get(i).total_area));
+//			tArea.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
+//			tArea.setLayoutParams(new TableRow.LayoutParams(0, rowHight, 1f));
+//			newTableRow.setTag(i);
+//			newTableRow.addView(tArea);
+//			
+//			if (i%2 == 1)
+//			{	
+//				newTableRow.setBackgroundResource(R.drawable.table_row_odd_selector);
+////				newTableRow.setBackground(getResources().getDrawable(R.drawable.table_row_odd_selector));
+//			}else {
+//				newTableRow.setBackgroundResource(R.drawable.table_row_even_selector);
+////				newTableRow.setBackground(getResources().getDrawable(R.drawable.table_row_even_selector));
+//			}
+//			
+//
+//			newTableRow.setOnClickListener(new OnClickListener()
+//			{
+//
+//				@Override
+//				public void onClick(View v)
+//				{
+//					// Toast.makeText(getActivity(), "row click",
+//					// Toast.LENGTH_SHORT).show();
+//					Intent intent = new Intent();
+//					intent.putExtra("MonthKey", Datas.getKeyByPosition(mPosition));
+//					intent.putExtra("RowNumber", Integer.valueOf(newTableRow.getTag().toString()));
+//					intent.setClass(getActivity(), DetailActivity.class);
+//					startActivity(intent);
+//				}
+//			});
+//
+//			// TextView tRoomsView = new TextView(getActivity());
+//			// tRoomsView.setText("3/2/1");
+//			// tRoomsView.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.TOP);
+//			// tRoomsView.setLayoutParams(new TableRow.LayoutParams(0, 40, 1f));
+//			// newTableRow.addView(tRoomsView);
+//
+//			detailTableLayout.addView(newTableRow);
+//
+//		}
 	}
 
 	public void setBriefViews()
