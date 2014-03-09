@@ -509,16 +509,16 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 		int startMonth = 0;
 		int startYear = 0;
-		if (month > 4)
+		if (month > 3)
 		{
-			startMonth = month - 4;
+			startMonth = month - 3;
 			startYear = year;
 
 		} else
 		{
-			for (int i = 0; i < 4; i++)
+			for (int i = 0; i < 3; i++)
 			{
-				startMonth = (month + 12 - 4) % 12;
+				startMonth = (month + 12 - 3) % 12;
 				startYear = year - 1;
 			}
 		}
