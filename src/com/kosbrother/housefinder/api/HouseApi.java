@@ -7,21 +7,14 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.sql.SQLException;
-import java.sql.Savepoint;
 import java.util.ArrayList;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.util.Log;
 
-import com.j256.ormlite.android.AndroidDatabaseConnection;
-import com.j256.ormlite.dao.Dao;
 import com.kosbrother.housefinder.Datas;
-import com.kosbrother.housefinder.MainActivity;
-import com.kosbrother.housefinder.data.OrmRealEstate;
 import com.kosbrother.housefinder.entity.BuildingData;
 import com.kosbrother.housefinder.entity.LandData;
 import com.kosbrother.housefinder.entity.ParkingData;
