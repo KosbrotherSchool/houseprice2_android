@@ -173,10 +173,18 @@ public class MonthPriceChangeActivity extends Activity implements
 
 			double avg = Datas.getMonthAvgSquarePrice(monthKey);
 			priceAvgTextView.setText(InfoParserApi.parseSquarePrice(avg));
-
-			// double priceChange1 = Datas.getSquarePriceChange(monthKey1,
-			// monthKey2);
-			priceChangeTextView.setText("222");
+			
+			try
+			{
+				String monthKey2 = Datas.getKeyByPosition(i-1);
+				double priceChange1 = Datas.getSquarePriceChange(monthKey,
+				monthKey2);
+				priceChangeTextView.setText(InfoParserApi.parsePriceChangePercent(priceChange1));
+			} catch (Exception e)
+			{
+				priceChangeTextView.setText("~");
+			}
+			
 
 			double lp = Datas.getMonthLowSquarePrice(monthKey);
 			priceLowTextView.setText(InfoParserApi.parseSquarePrice(lp));
