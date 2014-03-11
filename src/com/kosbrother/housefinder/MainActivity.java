@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
+import android.R.integer;
 import android.app.ActivityManager;
 import android.app.ActivityManager.MemoryInfo;
 import android.app.AlertDialog;
@@ -113,12 +114,12 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 	private Button dateButton;
 	private Button distanceButton;
-//	private TextView housePriceChangeingTextView;
-//	private TextView housePriceLisTextView;
+	// private TextView housePriceChangeingTextView;
+	// private TextView housePriceLisTextView;
 	private LinearLayout priceChangeLayout;
 	private LinearLayout dataListLayout;
 	private LinearLayout findHouseLayout;
-	
+
 	private MarkerOptions loacationMarker;
 
 	private int crawlDateNum;
@@ -130,7 +131,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 	public static boolean isReSearch = true;
 	public static boolean isResetView = false;
-	
+
 	// private DatabaseHelper databaseHelper = null;
 
 	@Override
@@ -142,12 +143,14 @@ public class MainActivity extends SherlockFragmentActivity implements
 		AppConstants.km_dis = Double.valueOf(Setting.getSetting(
 				Setting.keyKmDistance, this));
 		crawlDateNum = Setting.getCurrentDateNum(this);
-//		housePriceChangeingTextView = (TextView) findViewById(R.id.house_price_changing_text);
-//		housePriceLisTextView = (TextView) findViewById(R.id.house_price_data_list_text);
+		// housePriceChangeingTextView = (TextView)
+		// findViewById(R.id.house_price_changing_text);
+		// housePriceLisTextView = (TextView)
+		// findViewById(R.id.house_price_data_list_text);
 		priceChangeLayout = (LinearLayout) findViewById(R.id.linear_price_change);
 		dataListLayout = (LinearLayout) findViewById(R.id.linear_data_list);
 		findHouseLayout = (LinearLayout) findViewById(R.id.linear_find_house);
-		
+
 		dateButton = (Button) findViewById(R.id.button_date);
 		previousImageButton = (ImageButton) findViewById(R.id.previous_img_button);
 		nextImageButton = (ImageButton) findViewById(R.id.next_img_button);
@@ -378,11 +381,30 @@ public class MainActivity extends SherlockFragmentActivity implements
 									// TODO: handle exception
 								}
 
+								int endDate = endYear * 100 + endMonth;
+
 								if (startYear < 96)
 								{
 									Toast.makeText(MainActivity.this,
 											"起始年不可低於96年", Toast.LENGTH_SHORT)
 											.show();
+								} else if (endDate > crawlDateNum)
+								{
+
+									int crawlYear = crawlDateNum / 100;
+									int crawlMomth = crawlDateNum % 100;
+
+									Toast.makeText(
+											MainActivity.this,
+											"最新資料為"
+													+ Integer
+															.toString(crawlYear)
+													+ "年"
+													+ Integer
+															.toString(crawlMomth)
+													+ "月", Toast.LENGTH_SHORT)
+											.show();
+
 								} else if ((startYear * 100 + startMonth) > (endYear * 100 + endMonth))
 								{
 									Toast.makeText(MainActivity.this,
@@ -421,7 +443,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 			public void onClick(View v)
 			{
 				Intent intent = new Intent();
-				intent.setClass(MainActivity.this, MonthPriceChangeActivity.class);
+				intent.setClass(MainActivity.this,
+						MonthPriceChangeActivity.class);
 				startActivity(intent);
 			}
 		});
@@ -437,19 +460,19 @@ public class MainActivity extends SherlockFragmentActivity implements
 				startActivity(intent);
 			}
 		});
-		
+
 		findHouseLayout.setOnClickListener(new OnClickListener()
 		{
-			
+
 			@Override
 			public void onClick(View arg0)
 			{
 				Intent intent = new Intent();
 				intent.setClass(MainActivity.this, ActionBarTabs.class);
-				startActivity(intent);			
+				startActivity(intent);
 			}
 		});
-		
+
 		// test total memory
 		// String totalString = getTotalRAM();
 		// Long avalableLong = getCurrentMemory();
@@ -724,7 +747,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	{
 
 	}
-	
+
 	@Override
 	protected void onResume()
 	{
@@ -735,7 +758,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			isResetView = false;
 		}
 	}
-	
+
 	private void reSetViews()
 	{
 		// set distance button
@@ -748,7 +771,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		// set map marker
 		new addMarkerTask().execute();
 	}
-	
+
 	private void setDateButtonText()
 	{
 		int startYear = AppConstants.startDate / 100;
@@ -762,11 +785,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 				+ Integer.toString(endYear) + "/" + Integer.toString(endMonth));
 
 	}
-	
+
 	@Override
 	public void onLocationChanged(Location arg0)
 	{
-	
+
 	}
 
 	@Override
@@ -1166,36 +1189,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 		// e.printStackTrace();
 		// }
 
-	}
-
-	private class GetCurrentDateTask extends AsyncTask<Void, Void, Void>
-	{
-
-		@Override
-		protected Void doInBackground(Void... arg0)
-		{
-			// TODO Auto-generated method stub
-			int currentDate = HouseApi.getCurrentCrawlDate();
-			if (!(currentDate == 0))
-			{
-				crawlDateNum = currentDate;
-				Setting.setCurrentDateNum(MainActivity.this, crawlDateNum);
-			}
-
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(Void result)
-		{
-			// Toast.makeText(MainActivity.this, Integer.toString(crawlDateNum),
-			// Toast.LENGTH_SHORT).show();
-			if (!isEstatesTaskRunning)
-			{
-				getLocation(true, 0);
-			}
-
-		}
 	}
 
 	private class addMarkerTask extends AsyncTask<Void, Void, Void>
