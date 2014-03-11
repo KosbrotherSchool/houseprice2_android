@@ -1,6 +1,5 @@
 package com.kosbrother.housefinder.fragment;
 
-import android.app.ActionBar.LayoutParams;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -67,10 +66,11 @@ public class DetailFragment extends Fragment
 		if (mMonthKey.equals(""))
 		{
 			theEstate = Datas.mEstates.get(mNum);
-		}else {
+		} else
+		{
 			theEstate = Datas.mEstatesMap.get(mMonthKey).get(mNum);
 		}
-		
+
 		new GetEstatesTask().execute();
 	}
 
@@ -86,10 +86,13 @@ public class DetailFragment extends Fragment
 	private TextView text_estate_type;
 	private TextView text_content_buy;
 	private TextView text_ground_exchange_area;
-	private TextView text_building_exchange_area;
+	private TextView text_building_rooms;
 	private TextView text_buy_per_square_feet;
 	private TextView text_buy_total_price;
-
+	private TextView text_buiding_type;
+	private LinearLayout buildingRoomsLayout;
+	private LinearLayout detailEstateContentLayout;
+	
 	// ground detail
 	private LinearLayout groundDetailLayout;
 
@@ -98,7 +101,7 @@ public class DetailFragment extends Fragment
 
 	// parking detail
 	private LinearLayout parkingDetailLayout;
-
+	
 	private ProgressDialog mProgressDialog;
 
 	@Override
@@ -119,19 +122,23 @@ public class DetailFragment extends Fragment
 				.findViewById(R.id.text_detail_content_buy);
 		text_ground_exchange_area = (TextView) v
 				.findViewById(R.id.text_detail_ground_exchange_area);
-		text_building_exchange_area = (TextView) v
-				.findViewById(R.id.text_detail_building_exchange_area);
+		text_building_rooms = (TextView) v
+				.findViewById(R.id.text_detail_building_rooms);
 		text_buy_per_square_feet = (TextView) v
 				.findViewById(R.id.text_detail_buy_per_square_feet);
 		text_buy_total_price = (TextView) v
 				.findViewById(R.id.text_detail_buy_total_price);
-
+		text_buiding_type = (TextView) v
+				.findViewById(R.id.text_detail_building_type);
+		buildingRoomsLayout = (LinearLayout) v.findViewById(R.id.rooms_linear_layout);
+		detailEstateContentLayout = (LinearLayout) v.findViewById(R.id.detail_estate_content_layout);
+		
 		groundDetailLayout = (LinearLayout) v.findViewById(R.id.layout_ground);
 		buildingDetailLayout = (LinearLayout) v
 				.findViewById(R.id.layout_building);
 		parkingDetailLayout = (LinearLayout) v
 				.findViewById(R.id.layout_parking);
-
+		
 		// set image
 		String x_long = Double.toString(theEstate.x_long);
 		String y_lat = Double.toString(theEstate.y_lat);
@@ -184,6 +191,7 @@ public class DetailFragment extends Fragment
 
 			if (isGotData)
 			{
+				detailEstateContentLayout.setVisibility(View.VISIBLE);
 				for (int i = 0; i < Datas.mDetailEstates.size(); i++)
 				{
 					RealEstate tEstate = Datas.mDetailEstates.get(i);
@@ -196,148 +204,156 @@ public class DetailFragment extends Fragment
 				text_address.setText(theEstate.estate_address);
 				int year = theEstate.exchange_date / 100;
 				int month = theEstate.exchange_date % 100;
-				text_date.setText(Integer.toString(year)
-						+ "/" + Integer.toString(month));
+				text_date.setText(Integer.toString(year) + "/"
+						+ Integer.toString(month));
 				text_estate_type.setText(InfoParserApi
 						.parseGroundType(theEstate.ground_type_id));
+				text_buiding_type.setText(InfoParserApi
+						.parseBuildingType(theEstate.building_type_id));
+
 				text_content_buy.setText(theEstate.exchange_content);
 
 				text_ground_exchange_area.setText(Double
 						.toString(theEstate.total_area) + "坪");
-				text_building_exchange_area.setText(theEstate.building_rooms);
+				
+				if (theEstate.building_rooms.equals(""))
+				{
+					buildingRoomsLayout.setVisibility(View.GONE);
+				}else {
+					text_building_rooms.setText(theEstate.building_rooms);
+				}
+				
+				
 				text_buy_per_square_feet.setText(Double
 						.toString(theEstate.square_price) + "萬");
 				text_buy_total_price.setText(Integer
 						.toString(theEstate.total_price) + "萬");
 
-				for (int i = 0; i < Datas.mLandDatas.size(); i++)
+				if (Datas.mLandDatas.size() == 0)
 				{
-					LandData theLandData = Datas.mLandDatas.get(i);
-					if (theLandData.estate_id == theEstate.estate_id)
+					TextView noDataTextView = new TextView(getActivity());
+					noDataTextView.setText("無資料");
+					noDataTextView.setTextSize(text_size);
+					noDataTextView.setTextColor(getResources().getColor(
+							R.color.white));
+					groundDetailLayout.addView(noDataTextView);
+				} else
+				{
+					Boolean isHasData = false;
+					int num = 0;
+					for (int i = 0; i < Datas.mLandDatas.size(); i++)
 					{
-						TextView t_position = new TextView(getActivity());
-						t_position.setText("區域路段:" + theLandData.land_position);
-						t_position.setTextSize(text_size);
-						t_position.setTextColor(getResources().getColor(R.color.white));
-						groundDetailLayout.addView(t_position);
+						LandData theLandData = Datas.mLandDatas.get(i);
+						if (theLandData.estate_id == theEstate.estate_id)
+						{
+							num = num + 1;
+							isHasData = true;
+							TextView noDataTextView = new TextView(
+									getActivity());
+							noDataTextView.setText("第" + Integer.valueOf(num)
+									+ "筆資料");
+							noDataTextView.setTextSize(text_size);
+							noDataTextView.setTextColor(getResources()
+									.getColor(R.color.light_blue));
+							groundDetailLayout.addView(noDataTextView);
+							addLandData(theLandData);
 
-						TextView t_area = new TextView(getActivity());
-						t_area.setText("土地坪數:" + theLandData.land_area);
-						t_area.setTextSize(text_size);
-						t_area.setTextColor(getResources().getColor(R.color.white));
-						groundDetailLayout.addView(t_area);
-
-						TextView t_usage = new TextView(getActivity());
-						t_usage.setText("使用分區:" + theLandData.land_usage);
-						t_usage.setTextSize(text_size);
-						t_usage.setTextColor(getResources().getColor(R.color.white));
-						groundDetailLayout.addView(t_usage);
-
-						LinearLayout line = new LinearLayout(getActivity());
-						line.setLayoutParams(new LinearLayout.LayoutParams(
-								LayoutParams.MATCH_PARENT, 1, 0));
-						line.setBackgroundColor(getResources().getColor(
-								R.color.line_gray));
-						groundDetailLayout.addView(line);
-
+						}
+					}
+					if (!isHasData)
+					{
+						TextView noDataTextView = new TextView(getActivity());
+						noDataTextView.setText("無資料");
+						noDataTextView.setTextSize(text_size);
+						noDataTextView.setTextColor(getResources().getColor(
+								R.color.white));
+						groundDetailLayout.addView(noDataTextView);
 					}
 				}
 
-				groundDetailLayout.removeViewAt(groundDetailLayout
-						.getChildCount() - 1);
-
-				for (int i = 0; i < Datas.mBuildingDatas.size(); i++)
+				if (Datas.mBuildingDatas.size() == 0)
 				{
-					BuildingData theBuildingData = Datas.mBuildingDatas.get(i);
-					if (theBuildingData.estate_id == theEstate.estate_id)
+					TextView noDataTextView = new TextView(getActivity());
+					noDataTextView.setText("無資料");
+					noDataTextView.setTextSize(text_size);
+					noDataTextView.setTextColor(getResources().getColor(
+							R.color.white));
+					buildingDetailLayout.addView(noDataTextView);
+
+				} else
+				{
+					Boolean isHasData = false;
+					int num = 0;
+					for (int i = 0; i < Datas.mBuildingDatas.size(); i++)
 					{
-						TextView t_age = new TextView(getActivity());
-						t_age.setText("建物年齡:"
-								+ Integer.toString(theBuildingData.age));
-						t_age.setTextSize(text_size);
-						t_age.setTextColor(getResources().getColor(R.color.white));
-						buildingDetailLayout.addView(t_age);
-
-						TextView t_area = new TextView(getActivity());
-						t_area.setText("建物坪數:" + theBuildingData.building_area);
-						t_area.setTextSize(text_size);
-						t_area.setTextColor(getResources().getColor(R.color.white));
-						buildingDetailLayout.addView(t_area);
-
-						TextView t_purpose = new TextView(getActivity());
-						t_purpose.setText("建物目的:"
-								+ theBuildingData.building_purpose);
-						t_purpose.setTextSize(text_size);
-						t_purpose.setTextColor(getResources().getColor(R.color.white));
-						buildingDetailLayout.addView(t_purpose);
-
-						TextView t_material = new TextView(getActivity());
-						t_material.setText("主要建材:"
-								+ theBuildingData.building_material);
-						t_material.setTextSize(text_size);
-						t_material.setTextColor(getResources().getColor(R.color.white));
-						buildingDetailLayout.addView(t_material);
-
-						TextView t_date = new TextView(getActivity());
-						t_date.setText("完成年月日:" + theBuildingData.built_date);
-						t_date.setTextSize(text_size);
-						t_date.setTextColor(getResources().getColor(R.color.white));
-						buildingDetailLayout.addView(t_date);
-
-						TextView t_layer = new TextView(getActivity());
-						t_layer.setText("樓層:" + theBuildingData.building_layer
-								+ "/" + theBuildingData.building_total_layer);
-						t_layer.setTextSize(text_size);
-						t_layer.setTextColor(getResources().getColor(R.color.white));
-						buildingDetailLayout.addView(t_layer);
-
-						LinearLayout line = new LinearLayout(getActivity());
-						line.setLayoutParams(new LinearLayout.LayoutParams(
-								LayoutParams.MATCH_PARENT, 1, 0));
-						line.setBackgroundColor(getResources().getColor(
-								R.color.line_gray));
-						buildingDetailLayout.addView(line);
-
+						BuildingData theBuildingData = Datas.mBuildingDatas
+								.get(i);
+						if (theBuildingData.estate_id == theEstate.estate_id)
+						{
+							num = num + 1;
+							isHasData = true;
+							TextView noDataTextView = new TextView(
+									getActivity());
+							noDataTextView.setText("第" + Integer.valueOf(num)
+									+ "筆資料");
+							noDataTextView.setTextSize(text_size);
+							noDataTextView.setTextColor(getResources()
+									.getColor(R.color.light_blue));
+							buildingDetailLayout.addView(noDataTextView);
+							addBuildingData(theBuildingData);
+						}
+					}
+					if (!isHasData)
+					{
+						TextView noDataTextView = new TextView(getActivity());
+						noDataTextView.setText("無資料");
+						noDataTextView.setTextSize(text_size);
+						noDataTextView.setTextColor(getResources().getColor(
+								R.color.white));
+						buildingDetailLayout.addView(noDataTextView);
 					}
 				}
 
-				buildingDetailLayout.removeViewAt(buildingDetailLayout
-						.getChildCount() - 1);
-
-				for (int j = 0; j < Datas.mParkingDatas.size(); j++)
+				if (Datas.mParkingDatas.size() == 0)
 				{
-					ParkingData theParkingData = Datas.mParkingDatas.get(j);
-					if (theParkingData.estate_id == theEstate.estate_id)
+					TextView noDataTextView = new TextView(getActivity());
+					noDataTextView.setText("無資料");
+					noDataTextView.setTextSize(text_size);
+					noDataTextView.setTextColor(getResources().getColor(
+							R.color.white));
+					parkingDetailLayout.addView(noDataTextView);
+				} else
+				{
+					Boolean isHasData = false;
+					int num = 0;
+					for (int j = 0; j < Datas.mParkingDatas.size(); j++)
 					{
-						TextView t_type = new TextView(getActivity());
-						t_type.setText("車位類別:" + theParkingData.parking_type);
-						t_type.setTextSize(text_size);
-						t_type.setTextColor(getResources().getColor(R.color.white));
-						parkingDetailLayout.addView(t_type);
-
-						TextView t_price = new TextView(getActivity());
-						t_price.setText("車位價格:" + theParkingData.parking_price);
-						t_price.setTextSize(text_size);
-						t_price.setTextColor(getResources().getColor(R.color.white));
-						parkingDetailLayout.addView(t_price);
-
-						TextView t_area = new TextView(getActivity());
-						t_area.setText("車位面積:" + theParkingData.parking_area);
-						t_area.setTextSize(text_size);
-						t_area.setTextColor(getResources().getColor(R.color.white));
-						parkingDetailLayout.addView(t_area);
-
-						LinearLayout line = new LinearLayout(getActivity());
-						line.setLayoutParams(new LinearLayout.LayoutParams(
-								LayoutParams.MATCH_PARENT, 1, 0));
-						line.setBackgroundColor(getResources().getColor(
-								R.color.line_gray));
-						parkingDetailLayout.addView(line);
+						ParkingData theParkingData = Datas.mParkingDatas.get(j);
+						if (theParkingData.estate_id == theEstate.estate_id)
+						{
+							num = num + 1;
+							isHasData = true;
+							TextView noDataTextView = new TextView(
+									getActivity());
+							noDataTextView.setText("第" + Integer.valueOf(num)
+									+ "筆資料");
+							noDataTextView.setTextSize(text_size);
+							noDataTextView.setTextColor(getResources()
+									.getColor(R.color.light_blue));
+							parkingDetailLayout.addView(noDataTextView);
+							addParkingData(theParkingData);
+						}
+					}
+					if (!isHasData)
+					{
+						TextView noDataTextView = new TextView(getActivity());
+						noDataTextView.setText("無資料");
+						noDataTextView.setTextSize(text_size);
+						noDataTextView.setTextColor(getResources().getColor(
+								R.color.white));
+						parkingDetailLayout.addView(noDataTextView);
 					}
 				}
-
-				parkingDetailLayout.removeViewAt(parkingDetailLayout
-						.getChildCount() - 1);
 
 			} else
 			{
@@ -346,6 +362,88 @@ public class DetailFragment extends Fragment
 			}
 
 		}
+	}
+
+	private void addParkingData(ParkingData theParkingData)
+	{
+		TextView t_type = new TextView(getActivity());
+		t_type.setText("車位類別:" + theParkingData.parking_type);
+		t_type.setTextSize(text_size);
+		t_type.setTextColor(getResources().getColor(R.color.white));
+		parkingDetailLayout.addView(t_type);
+
+		TextView t_price = new TextView(getActivity());
+		t_price.setText("車位價格:" + theParkingData.parking_price);
+		t_price.setTextSize(text_size);
+		t_price.setTextColor(getResources().getColor(R.color.white));
+		parkingDetailLayout.addView(t_price);
+
+		TextView t_area = new TextView(getActivity());
+		t_area.setText("車位面積:" + theParkingData.parking_area);
+		t_area.setTextSize(text_size);
+		t_area.setTextColor(getResources().getColor(R.color.white));
+		parkingDetailLayout.addView(t_area);
+	}
+
+	private void addLandData(LandData theLandData)
+	{
+		TextView t_position = new TextView(getActivity());
+		t_position.setText("區域路段:" + theLandData.land_position);
+		t_position.setTextSize(text_size);
+		t_position.setTextColor(getResources().getColor(R.color.white));
+		groundDetailLayout.addView(t_position);
+
+		TextView t_area = new TextView(getActivity());
+		t_area.setText("土地坪數:" + theLandData.land_area);
+		t_area.setTextSize(text_size);
+		t_area.setTextColor(getResources().getColor(R.color.white));
+		groundDetailLayout.addView(t_area);
+
+		TextView t_usage = new TextView(getActivity());
+		t_usage.setText("使用分區:" + theLandData.land_usage);
+		t_usage.setTextSize(text_size);
+		t_usage.setTextColor(getResources().getColor(R.color.white));
+		groundDetailLayout.addView(t_usage);
+	}
+
+	private void addBuildingData(BuildingData theBuildingData)
+	{
+		TextView t_age = new TextView(getActivity());
+		t_age.setText("建物年齡:" + Integer.toString(theBuildingData.age));
+		t_age.setTextSize(text_size);
+		t_age.setTextColor(getResources().getColor(R.color.white));
+		buildingDetailLayout.addView(t_age);
+
+		TextView t_area = new TextView(getActivity());
+		t_area.setText("建物坪數:" + theBuildingData.building_area);
+		t_area.setTextSize(text_size);
+		t_area.setTextColor(getResources().getColor(R.color.white));
+		buildingDetailLayout.addView(t_area);
+
+		TextView t_purpose = new TextView(getActivity());
+		t_purpose.setText("建物目的:" + theBuildingData.building_purpose);
+		t_purpose.setTextSize(text_size);
+		t_purpose.setTextColor(getResources().getColor(R.color.white));
+		buildingDetailLayout.addView(t_purpose);
+
+		TextView t_material = new TextView(getActivity());
+		t_material.setText("主要建材:" + theBuildingData.building_material);
+		t_material.setTextSize(text_size);
+		t_material.setTextColor(getResources().getColor(R.color.white));
+		buildingDetailLayout.addView(t_material);
+
+		TextView t_date = new TextView(getActivity());
+		t_date.setText("完成年月日:" + theBuildingData.built_date);
+		t_date.setTextSize(text_size);
+		t_date.setTextColor(getResources().getColor(R.color.white));
+		buildingDetailLayout.addView(t_date);
+
+		TextView t_layer = new TextView(getActivity());
+		t_layer.setText("樓層:" + theBuildingData.building_layer + "/"
+				+ theBuildingData.building_total_layer);
+		t_layer.setTextSize(text_size);
+		t_layer.setTextColor(getResources().getColor(R.color.white));
+		buildingDetailLayout.addView(t_layer);
 	}
 
 	@Override

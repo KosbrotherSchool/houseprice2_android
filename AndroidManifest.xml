@@ -70,6 +70,16 @@
             android:name=".MonthPriceChangeActivity"
             android:configChanges="keyboardHidden|orientation" >
         </activity>
+        <!-- <activity
+            android:name=".FindHouseActivity"
+            android:configChanges="keyboardHidden|orientation"
+            android:screenOrientation="portrait" >
+        </activity> -->
+        <activity
+            android:name=".ActionBarTabs"
+            android:configChanges="keyboardHidden|orientation"
+            android:screenOrientation="portrait" >
+        </activity>
 
         <!-- Goolge Maps API Key -->
         <meta-data

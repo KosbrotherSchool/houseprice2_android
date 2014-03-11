@@ -104,11 +104,6 @@ public class DetailListAdapter extends BaseAdapter
 
 		}
 
-		// imageLoader.DisplayImage(data.get(position).getThumbnail(), image);
-
-		// vi.setClickable(true);
-		// vi.setFocusable(true);
-//		vi.setBackgroundResource(android.R.drawable.menuitem_background);
 		vi.setOnClickListener(new OnClickListener()
 		{
 			@Override

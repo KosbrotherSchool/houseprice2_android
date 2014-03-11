@@ -113,9 +113,12 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 	private Button dateButton;
 	private Button distanceButton;
-	private TextView housePriceChangeingTextView;
-	private TextView housePriceLisTextView;
-
+//	private TextView housePriceChangeingTextView;
+//	private TextView housePriceLisTextView;
+	private LinearLayout priceChangeLayout;
+	private LinearLayout dataListLayout;
+	private LinearLayout findHouseLayout;
+	
 	private MarkerOptions loacationMarker;
 
 	private int crawlDateNum;
@@ -139,8 +142,12 @@ public class MainActivity extends SherlockFragmentActivity implements
 		AppConstants.km_dis = Double.valueOf(Setting.getSetting(
 				Setting.keyKmDistance, this));
 		crawlDateNum = Setting.getCurrentDateNum(this);
-		housePriceChangeingTextView = (TextView) findViewById(R.id.house_price_changing_text);
-		housePriceLisTextView = (TextView) findViewById(R.id.house_price_data_list_text);
+//		housePriceChangeingTextView = (TextView) findViewById(R.id.house_price_changing_text);
+//		housePriceLisTextView = (TextView) findViewById(R.id.house_price_data_list_text);
+		priceChangeLayout = (LinearLayout) findViewById(R.id.linear_price_change);
+		dataListLayout = (LinearLayout) findViewById(R.id.linear_data_list);
+		findHouseLayout = (LinearLayout) findViewById(R.id.linear_find_house);
+		
 		dateButton = (Button) findViewById(R.id.button_date);
 		previousImageButton = (ImageButton) findViewById(R.id.previous_img_button);
 		nextImageButton = (ImageButton) findViewById(R.id.next_img_button);
@@ -407,7 +414,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			}
 		});
 
-		housePriceChangeingTextView.setOnClickListener(new OnClickListener()
+		priceChangeLayout.setOnClickListener(new OnClickListener()
 		{
 
 			@Override
@@ -419,7 +426,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			}
 		});
 
-		housePriceLisTextView.setOnClickListener(new OnClickListener()
+		dataListLayout.setOnClickListener(new OnClickListener()
 		{
 
 			@Override
@@ -430,7 +437,19 @@ public class MainActivity extends SherlockFragmentActivity implements
 				startActivity(intent);
 			}
 		});
-
+		
+		findHouseLayout.setOnClickListener(new OnClickListener()
+		{
+			
+			@Override
+			public void onClick(View arg0)
+			{
+				Intent intent = new Intent();
+				intent.setClass(MainActivity.this, ActionBarTabs.class);
+				startActivity(intent);			
+			}
+		});
+		
 		// test total memory
 		// String totalString = getTotalRAM();
 		// Long avalableLong = getCurrentMemory();
@@ -651,13 +670,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 														.getLongitude();
 												AppConstants.currentLatLng = new LatLng(
 														geoLat, geoLong);
-												// mGoogleMap
-												// .animateCamera(CameraUpdateFactory
-												// .newLatLngZoom(
-												// new LatLng(
-												// AppConstants.currentLatLng.latitude,
-												// AppConstants.currentLatLng.longitude),
-												// 16.0f));
 												getLocation(false, 1);
 											}
 											return true;
@@ -835,21 +847,21 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 				if (0 < AppConstants.km_dis && AppConstants.km_dis <= 0.3)
 				{
-					mapSize = 16.0f;
+					mapSize = 17.0f;
 				} else if (0.3 < AppConstants.km_dis
 						&& AppConstants.km_dis <= 0.5)
 				{
-					mapSize = 15.0f;
+					mapSize = 16.0f;
 				} else if (0.5 < AppConstants.km_dis
 						&& AppConstants.km_dis <= 1)
 				{
-					mapSize = 14.0f;
+					mapSize = 15.0f;
 				} else if (1 < AppConstants.km_dis && AppConstants.km_dis <= 2)
 				{
-					mapSize = 13.0f;
+					mapSize = 14.0f;
 				} else
 				{
-					mapSize = 12.0f;
+					mapSize = 13.0f;
 				}
 
 				if (aniParam == 0)
@@ -926,16 +938,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 					// do nothing
 				} else
 				{
-
 					new GetEstatesTask().execute();
-
-					// if (Datas.mArrayKey.size() == 0)
-					// {
-					// new GetCurrentDateTask().execute();
-					// } else
-					// {
-					//
-					// }
 				}
 
 			}
