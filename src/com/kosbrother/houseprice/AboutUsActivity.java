@@ -1,15 +1,14 @@
 package com.kosbrother.houseprice;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.MenuItem;
-
-public class AboutUsActivity extends SherlockActivity
+public class AboutUsActivity extends Activity
 {
 
 	private TextView contactTextView;
@@ -37,8 +36,8 @@ public class AboutUsActivity extends SherlockActivity
 			}
 		});
 
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		getSupportActionBar().setHomeButtonEnabled(true);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+		getActionBar().setHomeButtonEnabled(true);
 
 	}
 

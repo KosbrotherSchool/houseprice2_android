@@ -18,7 +18,7 @@ public class Setting
 	public final static String keyAreaMax = "Area_Max";
 	public final static String keyKmDistance = "Km_Distance";
 
-//	public final static String keyFirstOpen = "First_Open";
+	public final static String keyFirstOpenV2 = "First_OpenV2";
 	public final static String KeyCurrentDateNum = "Current_Data_Date";
 	public final static String KeyGiveStar = "Give_Star";
 	public final static String KeyPushStarDialog = "Push_Star_Dialog";
@@ -31,7 +31,7 @@ public class Setting
 	public final static String initialAreaMin = "0";
 	public final static String initialAreaMax = "0"; // 0 for max
 	public final static String initialKmDistance = "0.5";
-//	public final static boolean initialFirstOpen = true;
+	public final static boolean initialFirstOpenV2 = true;
 	public final static int initialCurrentDate = 10212;
 	public final static boolean initialGiveStar = false;
 	public final static boolean initialPushStarDialog = true;
@@ -55,6 +55,7 @@ public class Setting
 		{
 			put(KeyGiveStar, initialGiveStar);
 			put(KeyPushStarDialog, initialPushStarDialog);
+			put(keyFirstOpenV2, initialFirstOpenV2);
 		}
 	};
 

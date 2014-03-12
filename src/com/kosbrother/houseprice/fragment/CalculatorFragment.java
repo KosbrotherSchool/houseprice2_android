@@ -21,6 +21,7 @@ import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.kosbrother.houseprice.AppConstants;
 import com.kosbrother.houseprice.R;
+import com.kosbrother.houseprice.Setting;
 
 
 public class CalculatorFragment extends Fragment implements OnClickListener
@@ -78,7 +79,7 @@ public class CalculatorFragment extends Fragment implements OnClickListener
 		
 		imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
 	    
-//		CallAds();
+		CallAds();
 		return v;
 	}
 
@@ -138,36 +139,40 @@ public class CalculatorFragment extends Fragment implements OnClickListener
 	private void CallAds()
 	{
 
+		boolean isGivenStar = Setting.getBooleanSetting(Setting.KeyGiveStar, getActivity());
 		
-		final AdRequest adReq = new AdRequest.Builder().build();
-
-		// 12-18 17:01:12.438: I/Ads(8252): Use
-		// AdRequest.Builder.addTestDevice("A25819A64B56C65500038B8A9E7C19DD")
-		// to get test ads on this device.
-
-		adMobAdView = new AdView(getActivity());
-		adMobAdView.setAdSize(AdSize.SMART_BANNER);
-		adMobAdView.setAdUnitId(AppConstants.MEDIATION_KEY);
-
-		adMobAdView.loadAd(adReq);
-		adMobAdView.setAdListener(new AdListener()
+		if (!isGivenStar)
 		{
-			@Override
-			public void onAdLoaded() {
-				adBannerLayout.setVisibility(View.VISIBLE);
-				
-				if (adBannerLayout.getChildAt(0)!=null)
-				{
-					adBannerLayout.removeViewAt(0);
+			final AdRequest adReq = new AdRequest.Builder().build();
+
+			// 12-18 17:01:12.438: I/Ads(8252): Use
+			// AdRequest.Builder.addTestDevice("A25819A64B56C65500038B8A9E7C19DD")
+			// to get test ads on this device.
+
+			adMobAdView = new AdView(getActivity());
+			adMobAdView.setAdSize(AdSize.SMART_BANNER);
+			adMobAdView.setAdUnitId(AppConstants.MEDIATION_KEY);
+
+			adMobAdView.loadAd(adReq);
+			adMobAdView.setAdListener(new AdListener()
+			{
+				@Override
+				public void onAdLoaded() {
+					adBannerLayout.setVisibility(View.VISIBLE);
+					if (adBannerLayout.getChildAt(0)!=null)
+					{
+						adBannerLayout.removeViewAt(0);
+					}
+					adBannerLayout.addView(adMobAdView);
 				}
-				adBannerLayout.addView(adMobAdView);
-			}
-			
-			public void onAdFailedToLoad(int errorCode) {
-				adBannerLayout.setVisibility(View.GONE);
-			}
-			
-		});		
+				
+				public void onAdFailedToLoad(int errorCode) {
+					adBannerLayout.setVisibility(View.GONE);
+				}
+				
+			});	
+		}
+		
 	}
 	
 }

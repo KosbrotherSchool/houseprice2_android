@@ -22,7 +22,7 @@ import com.kosbrother.houseprice.entity.RealEstate;
 
 public class HouseApi
 {
-	final static String HOST = "http://1.34.193.26/";
+	final static String HOST = "http://1.34.193.26";
 	public static final String TAG = "HOUSE_API";
 	public static final boolean DEBUG = true;
 
@@ -83,7 +83,7 @@ public class HouseApi
 	public static int getCurrentCrawlDate()
 	{
 		String message = getMessageFromServer("GET",
-				"/api/v2/estate/get_current_crawl_data", null, null);
+				"/api/v1/estate/get_current_crawl_data", null, null);
 		if (message == null)
 		{
 			return 0;

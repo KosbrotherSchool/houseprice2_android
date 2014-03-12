@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.kosbrother.houseprice"
-    android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionCode="9"
+    android:versionName="2.0.0" >
 
     <uses-sdk
         android:minSdkVersion="11"
@@ -33,8 +33,7 @@
             android:name="com.kosbrother.houseprice.EnterActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.NoTitleBar" 
-             >
+            android:theme="@android:style/Theme.NoTitleBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -44,8 +43,7 @@
         <activity
             android:name="com.kosbrother.houseprice.MainActivity"
             android:configChanges="keyboardHidden|orientation"
-            android:screenOrientation="portrait"
-            >
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.kosbrother.houseprice.FilterActivity"
@@ -90,11 +88,14 @@
             android:configChanges="keyboardHidden|orientation"
             android:screenOrientation="portrait" >
         </activity>
+        <activity
+            android:name="com.google.android.gms.ads.AdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize" />
 
         <!-- Goolge Maps API Key -->
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
-            android:value="AIzaSyDTkuZPQGoKvmK8sXsXe9Xl5z4WgUWYLfM" />
+            android:value="AIzaSyBfjsJt7q4Z9AxEGI9l_UnfGXc9fSv8VgY" />
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />

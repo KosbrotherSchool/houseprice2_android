@@ -2,16 +2,16 @@ package com.kosbrother.houseprice;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.view.MenuItem;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.MenuItem;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.kosbrother.houseprice.fragment.CalculatorFragment;
 
-public class CalculatorActivity extends SherlockFragmentActivity
+public class CalculatorActivity extends FragmentActivity
 {
 	private static final int CONTENT_VIEW_ID = 100;
 
@@ -35,9 +35,9 @@ public class CalculatorActivity extends SherlockFragmentActivity
 			ft.add(CONTENT_VIEW_ID, newFragment).commit();
 		}
 		
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		getSupportActionBar().setHomeButtonEnabled(true);
-		getSupportActionBar().setTitle("房貸計算");
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+		getActionBar().setHomeButtonEnabled(true);
+		getActionBar().setTitle("房貸計算");
 		
 	}
 

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">housefinder</string>
+    <string name="app_name">看屋高手</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
-    <string name="about_us">本程式由 Kosbrother工作室 所開發,\n\n實價登錄資料取自\n內政部網站的開源資訊,\n若有任何建議或合作機會. \n\n請利用底下的"聯絡我們"與我們聯繫</string>
+    <string name="about_us">看屋高手利用政府實價登錄資訊，\n根據你的房屋條件，\n自動找出在附近曾經成交的案例，\n並且計算出平均價/最高價/最低價，\n還有各月的漲跌幅，輕鬆掌握房價趨勢。\n\n幫助買屋或賣屋時，能快速做決策，不吃虧！\n成為真正的看屋高手！房屋交易就是這麼容易！\n\n若有任何建議或問題.\n請利用底下的"聯絡我們"與我們聯繫</string>
 
     <!-- Latitude, longitude format -->
     <string name="latitude_longitude">%1$.8f, %2$.8f</string>

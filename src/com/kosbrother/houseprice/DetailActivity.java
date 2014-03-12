@@ -1,19 +1,19 @@
 package com.kosbrother.houseprice;
 
+import android.app.ActionBar;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.RelativeLayout;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
@@ -21,7 +21,7 @@ import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.kosbrother.houseprice.fragment.DetailFragment;
 
-public class DetailActivity extends SherlockFragmentActivity
+public class DetailActivity extends FragmentActivity
 {
 	int NUM_ITEMS;
 	MyAdapter mAdapter;
@@ -56,7 +56,7 @@ public class DetailActivity extends SherlockFragmentActivity
 
 		mPager.setCurrentItem(position);
 
-		mActionBar = getSupportActionBar();
+		mActionBar = getActionBar();
 
 		// enable ActionBar app icon to behave as action to toggle nav drawer
 		mActionBar.setDisplayHomeAsUpEnabled(true);
@@ -93,7 +93,7 @@ public class DetailActivity extends SherlockFragmentActivity
 			}
 		});
 
-//		CallAds();
+		CallAds();
 	}
 
 	public class MyAdapter extends FragmentStatePagerAdapter
@@ -191,7 +191,7 @@ public class DetailActivity extends SherlockFragmentActivity
 	{
 		super.onCreateOptionsMenu(menu);
 
-		getSupportMenuInflater().inflate(R.menu.detail, menu);
+		getMenuInflater().inflate(R.menu.detail, menu);
 
 		return super.onCreateOptionsMenu(menu);
 	}

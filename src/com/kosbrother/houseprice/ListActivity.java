@@ -3,16 +3,20 @@ package com.kosbrother.houseprice;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -25,10 +29,6 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
@@ -38,7 +38,7 @@ import com.kosbrother.houseprice.api.HouseApi;
 import com.kosbrother.houseprice.entity.RealEstate;
 import com.kosbrother.houseprice.fragment.BreiefFragment;
 
-public class ListActivity extends SherlockFragmentActivity
+public class ListActivity extends FragmentActivity
 {
 	int NUM_ITEMS;
 	MyAdapter mAdapter;
@@ -265,7 +265,7 @@ public class ListActivity extends SherlockFragmentActivity
 			}
 		});
 
-		mActionBar = getSupportActionBar();
+		mActionBar = getActionBar();
 		mActionBar.setDisplayHomeAsUpEnabled(true);
 		mActionBar.setHomeButtonEnabled(true);
 
@@ -294,7 +294,7 @@ public class ListActivity extends SherlockFragmentActivity
 			}
 		});
 
-		// CallAds();
+		 CallAds();
 	}
 
 	private void setDateButtonText()

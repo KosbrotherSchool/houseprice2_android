@@ -87,10 +87,4 @@
         android:layout_weight="1"
         layout="@layout/fragment_detail" />
 
-    <RelativeLayout
-        android:id="@+id/adLayout"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
-    </RelativeLayout>
-
 </LinearLayout>

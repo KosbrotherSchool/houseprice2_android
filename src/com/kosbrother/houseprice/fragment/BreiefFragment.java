@@ -28,19 +28,14 @@ public class BreiefFragment extends Fragment
 
 //	private TableLayout detailTableLayout;
 	private ListView detailListView;
-	private LinearLayout layoutBrief;
-	private View layoutDetailView;
 	private int mPosition;
 
 	private TextView textEstateItemNums;
 	private TextView textEstateSquarePrice;
 	private TextView textSquarePriceChange;
 	
-	private int rowHight = 0; 
 	
 	// private static BreiefFragment mBreiefFragment;
-	private RelativeLayout adBannerLayout;
-	private AdView adMobAdView;
 	
 	
 	public static BreiefFragment newInstance(int position)
@@ -57,8 +52,6 @@ public class BreiefFragment extends Fragment
 	{
 		// mBreiefFragment = this;
 		View v = inflater.inflate(R.layout.fragment_breief, null);
-		layoutBrief = (LinearLayout) v.findViewById(R.id.layout_breif);
-		layoutDetailView = v.findViewById(R.id.layout_detail);
 
 		textEstateItemNums = (TextView) v.findViewById(R.id.text_estate_item_num);
 		textEstateSquarePrice = (TextView) v.findViewById(R.id.text_estate_square_price);
@@ -67,10 +60,6 @@ public class BreiefFragment extends Fragment
 		detailListView = (ListView) v.findViewById(R.id.listview_detail);
 		Bundle bundle = getArguments();
 		mPosition = bundle.getInt("num");
-		
-		adBannerLayout = (RelativeLayout) v.findViewById(R.id.adLayout);
-		
-//		CallAds();
 		
 		setBriefViews();
 		addDetailViews();
@@ -83,45 +72,6 @@ public class BreiefFragment extends Fragment
 	{
 		super.onActivityCreated(savedInstanceState);
 
-	}
-	
-	private void CallAds()
-	{
-
-		boolean isGivenStar = Setting.getBooleanSetting(Setting.KeyGiveStar, getActivity());
-		
-		if (!isGivenStar)
-		{
-			final AdRequest adReq = new AdRequest.Builder().build();
-
-			// 12-18 17:01:12.438: I/Ads(8252): Use
-			// AdRequest.Builder.addTestDevice("A25819A64B56C65500038B8A9E7C19DD")
-			// to get test ads on this device.
-
-			adMobAdView = new AdView(getActivity());
-			adMobAdView.setAdSize(AdSize.SMART_BANNER);
-			adMobAdView.setAdUnitId(AppConstants.MEDIATION_KEY);
-
-			adMobAdView.loadAd(adReq);
-			adMobAdView.setAdListener(new AdListener()
-			{
-				@Override
-				public void onAdLoaded() {
-					adBannerLayout.setVisibility(View.VISIBLE);
-					if (adBannerLayout.getChildAt(0)!=null)
-					{
-						adBannerLayout.removeViewAt(0);
-					}
-					adBannerLayout.addView(adMobAdView);
-				}
-				
-				public void onAdFailedToLoad(int errorCode) {
-					adBannerLayout.setVisibility(View.GONE);
-				}
-				
-			});	
-		}
-		
 	}
 	
 	

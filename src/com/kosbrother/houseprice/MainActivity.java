@@ -24,6 +24,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.text.InputType;
@@ -32,6 +33,9 @@ import android.view.ActionProvider;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -47,6 +51,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
@@ -56,12 +61,12 @@ import at.bartinger.list.item.EntryItem;
 import at.bartinger.list.item.Item;
 import at.bartinger.list.item.SectionItem;
 
-import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.MapBuilder;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -80,7 +85,7 @@ import com.kosbrother.houseprice.api.HouseApi;
 import com.kosbrother.houseprice.entity.RealEstate;
 import com.kosbrother.houseprice.fragment.TransparentSupportMapFragment;
 
-public class MainActivity extends SherlockFragmentActivity implements
+public class MainActivity extends FragmentActivity implements
 		LocationListener, GooglePlayServicesClient.ConnectionCallbacks,
 		GooglePlayServicesClient.OnConnectionFailedListener, OnMapClickListener
 {
@@ -125,6 +130,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 	private int crawlDateNum;
 	private boolean isEstatesTaskRunning = false;
+	private RelativeLayout adBannerLayout;
+	private AdView adMobAdView;
 
 	private ArrayList<MarkerOptions> mMarkers = new ArrayList<MarkerOptions>();
 	// private int memorySize = 256;
@@ -141,13 +148,29 @@ public class MainActivity extends SherlockFragmentActivity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.drawer_layout);
 
+		boolean isFirstOpen = Setting.getBooleanSetting(Setting.keyFirstOpenV2,
+				this);
+		if (isFirstOpen)
+		{
+			final LinearLayout firstLinearLayout = (LinearLayout) findViewById(R.id.first_teach_layout);
+			firstLinearLayout.setVisibility(View.VISIBLE);
+			Button firstConfirButton = (Button) findViewById(R.id.first_confrim_button);
+			firstConfirButton.setOnClickListener(new OnClickListener()
+			{
+
+				@Override
+				public void onClick(View v)
+				{
+					Setting.saveBooleanSetting(Setting.keyFirstOpenV2, false,
+							MainActivity.this);
+					firstLinearLayout.setVisibility(View.GONE);
+				}
+			});
+		}
+
 		AppConstants.km_dis = Double.valueOf(Setting.getSetting(
 				Setting.keyKmDistance, this));
 		crawlDateNum = Setting.getCurrentDateNum(this);
-		// housePriceChangeingTextView = (TextView)
-		// findViewById(R.id.house_price_changing_text);
-		// housePriceLisTextView = (TextView)
-		// findViewById(R.id.house_price_data_list_text);
 		priceChangeLayout = (LinearLayout) findViewById(R.id.linear_price_change);
 		dataListLayout = (LinearLayout) findViewById(R.id.linear_data_list);
 		findHouseLayout = (LinearLayout) findViewById(R.id.linear_find_house);
@@ -536,8 +559,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 				GravityCompat.START);
 
 		// enable ActionBar app icon to behave as action to toggle nav drawer
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		getSupportActionBar().setHomeButtonEnabled(true);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+		getActionBar().setHomeButtonEnabled(true);
 
 		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
 				R.drawable.ic_drawer, R.string.drawer_open,
@@ -589,6 +612,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 		{
 			e.printStackTrace();
 		}
+
+		CallAds();
 
 	}
 
@@ -768,7 +793,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		itemSearch.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS
 				| MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
 
-		MenuInflater inflater = getSupportMenuInflater();
+		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.main, menu);
 		return super.onCreateOptionsMenu(menu);
 	}
@@ -1577,7 +1602,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 	@Override
 	public boolean onOptionsItemSelected(
-			com.actionbarsherlock.view.MenuItem item)
+			MenuItem item)
 	{
 		if (mDrawerToggle.onOptionsItemSelected(getMenuItem(item)))
 		{
@@ -1912,7 +1937,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 					MainActivity.this);
 
 			dialog.setTitle("給星星");
-			dialog.setMessage("您的五星評價是加速我們改進產品的動力，針對早期用戶, 我們會拿去廣告回饋喔~");
+			dialog.setMessage("您的五星評價是加速我們改進產品的動力，針對早期用戶, 我們會去廣告回饋喔~");
 			dialog.setPositiveButton("給星星",
 					new DialogInterface.OnClickListener()
 					{
@@ -2061,5 +2086,47 @@ public class MainActivity extends SherlockFragmentActivity implements
 	// }
 	// return databaseHelper;
 	// }
+
+	private void CallAds()
+	{
+		boolean isGivenStar = Setting.getBooleanSetting(Setting.KeyGiveStar,
+				MainActivity.this);
+
+		if (!isGivenStar)
+		{
+			adBannerLayout = (RelativeLayout) findViewById(R.id.adLayout);
+
+			final AdRequest adReq = new AdRequest.Builder().build();
+
+			// 12-18 17:01:12.438: I/Ads(8252): Use
+			// AdRequest.Builder.addTestDevice("A25819A64B56C65500038B8A9E7C19DD")
+			// to get test ads on this device.
+
+			adMobAdView = new AdView(MainActivity.this);
+			adMobAdView.setAdSize(AdSize.SMART_BANNER);
+			adMobAdView.setAdUnitId(AppConstants.MEDIATION_KEY);
+
+			adMobAdView.loadAd(adReq);
+			adMobAdView.setAdListener(new AdListener()
+			{
+				@Override
+				public void onAdLoaded()
+				{
+					adBannerLayout.setVisibility(View.VISIBLE);
+					if (adBannerLayout.getChildAt(0) != null)
+					{
+						adBannerLayout.removeViewAt(0);
+					}
+					adBannerLayout.addView(adMobAdView);
+				}
+
+				public void onAdFailedToLoad(int errorCode)
+				{
+					adBannerLayout.setVisibility(View.GONE);
+				}
+
+			});
+		}
+	}
 
 }

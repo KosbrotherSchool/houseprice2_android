@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnKeyListener;
 import android.view.ViewGroup;
@@ -32,9 +33,14 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.analytics.tracking.android.EasyTracker;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
 
 /**
  * This demonstrates the use of action bar tabs and how they interact with other
@@ -43,6 +49,10 @@ import com.google.analytics.tracking.android.EasyTracker;
 @SuppressLint("ValidFragment")
 public class ActionBarTabs extends FragmentActivity
 {
+	
+	private RelativeLayout adBannerLayout;
+	private AdView adMobAdView;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -53,6 +63,8 @@ public class ActionBarTabs extends FragmentActivity
 		ActionBar actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		// actionBar.setDisplayShowTitleEnabled(false);
+		actionBar.setDisplayHomeAsUpEnabled(true);
+		actionBar.setHomeButtonEnabled(true);
 		
 		actionBar.addTab(actionBar
 				.newTab()
@@ -72,9 +84,24 @@ public class ActionBarTabs extends FragmentActivity
 						new TabListener(
 								"http://m.591.com.tw/mobile-index.html?f=app",
 								"591")));
+		CallAds();
 
 	}
-
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		switch (item.getItemId())
+		{
+		   case android.R.id.home:
+	            finish();             
+	            return true;    
+		default:
+			break;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+	
 	/**
 	 * A TabListener receives event callbacks from the action bar as tabs are
 	 * deselected, selected, and reselected. A FragmentTransaction is provided
@@ -235,6 +262,46 @@ public class ActionBarTabs extends FragmentActivity
 			}
 		}
 
+	}
+	
+	private void CallAds()
+	{
+		boolean isGivenStar = Setting.getBooleanSetting(Setting.KeyGiveStar, ActionBarTabs.this);
+
+		if (!isGivenStar)
+		{
+			adBannerLayout = (RelativeLayout) findViewById(R.id.adLayout);
+			final AdRequest adReq = new AdRequest.Builder().build();
+
+			// 12-18 17:01:12.438: I/Ads(8252): Use
+			// AdRequest.Builder.addTestDevice("A25819A64B56C65500038B8A9E7C19DD")
+			// to get test ads on this device.
+
+			adMobAdView = new AdView(ActionBarTabs.this);
+			adMobAdView.setAdSize(AdSize.SMART_BANNER);
+			adMobAdView.setAdUnitId(AppConstants.MEDIATION_KEY);
+
+			adMobAdView.loadAd(adReq);
+			adMobAdView.setAdListener(new AdListener()
+			{
+				@Override
+				public void onAdLoaded()
+				{
+					adBannerLayout.setVisibility(View.VISIBLE);
+					if (adBannerLayout.getChildAt(0) != null)
+					{
+						adBannerLayout.removeViewAt(0);
+					}
+					adBannerLayout.addView(adMobAdView);
+				}
+
+				public void onAdFailedToLoad(int errorCode)
+				{
+					adBannerLayout.setVisibility(View.GONE);
+				}
+
+			});
+		}
 	}
 	
 	@Override

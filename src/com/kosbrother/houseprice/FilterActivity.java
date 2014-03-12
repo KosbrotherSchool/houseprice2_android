@@ -1,9 +1,12 @@
 package com.kosbrother.houseprice;
 
+import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
@@ -17,15 +20,13 @@ import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 
-public class FilterActivity extends SherlockFragmentActivity
+public class FilterActivity extends FragmentActivity
 {
 	private ActionBar mActionBar;
 
@@ -374,9 +375,11 @@ public class FilterActivity extends SherlockFragmentActivity
 		areaMinEditText = (EditText) findViewById(R.id.area_min);
 		areaMaxEditText = (EditText) findViewById(R.id.area_max);
 
-		mActionBar = getSupportActionBar();
+		mActionBar = getActionBar();
 		mActionBar.setTitle("看屋高手---搜索設定");
-
+		mActionBar.setDisplayHomeAsUpEnabled(true);
+		mActionBar.setHomeButtonEnabled(true);
+		
 		stringPurpose = Setting.getSetting(Setting.keyPurpose, this);
 		minHousePriceString = Setting
 				.getSetting(Setting.keyHousePriceMin, this);
@@ -566,7 +569,21 @@ public class FilterActivity extends SherlockFragmentActivity
 		CallAds();
 
 	}
-
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		switch (item.getItemId())
+		{
+		   case android.R.id.home:
+	            finish();             
+	            return true;    
+		default:
+			break;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+	
 	private void setCheckAllBuildingType(CheckBox building_type)
 	{
 		building_type.setOnCheckedChangeListener(new OnCheckedChangeListener()

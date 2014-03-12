@@ -8,14 +8,20 @@ import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.analytics.tracking.android.EasyTracker;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
 import com.kosbrother.houseprice.api.InfoParserApi;
 
 public class MonthPriceChangeActivity extends Activity implements
@@ -25,6 +31,9 @@ public class MonthPriceChangeActivity extends Activity implements
 	private LinearLayout monthItemLayout;
 	private LayoutInflater mInflater;
 	private TextView priceChangeText;
+	
+	private RelativeLayout adBannerLayout;
+	private AdView adMobAdView;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -45,7 +54,9 @@ public class MonthPriceChangeActivity extends Activity implements
 		final ActionBar actionBar = getActionBar();
 		actionBar.setDisplayShowTitleEnabled(false);
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-
+		actionBar.setDisplayHomeAsUpEnabled(true);
+		actionBar.setHomeButtonEnabled(true);
+		
 		ArrayList<String> itemList = new ArrayList<String>();
 		itemList.add("單價");
 		itemList.add("總價");
@@ -85,9 +96,24 @@ public class MonthPriceChangeActivity extends Activity implements
 		};
 
 		actionBar.setListNavigationCallbacks(adapter, this);
+		CallAds();
 
 	}
-
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		switch (item.getItemId())
+		{
+		   case android.R.id.home:
+	            finish();             
+	            return true;    
+		default:
+			break;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+	
 	@Override
 	public boolean onNavigationItemSelected(int itemPosition, long itemId)
 	{
@@ -217,6 +243,46 @@ public class MonthPriceChangeActivity extends Activity implements
 	{
 		super.onStop();
 		EasyTracker.getInstance(this).activityStop(this); // Add this method.
+	}
+	
+	private void CallAds()
+	{
+		boolean isGivenStar = Setting.getBooleanSetting(Setting.KeyGiveStar, MonthPriceChangeActivity.this);
+
+		if (!isGivenStar)
+		{
+			adBannerLayout = (RelativeLayout) findViewById(R.id.adLayout);
+			final AdRequest adReq = new AdRequest.Builder().build();
+
+			// 12-18 17:01:12.438: I/Ads(8252): Use
+			// AdRequest.Builder.addTestDevice("A25819A64B56C65500038B8A9E7C19DD")
+			// to get test ads on this device.
+
+			adMobAdView = new AdView(MonthPriceChangeActivity.this);
+			adMobAdView.setAdSize(AdSize.SMART_BANNER);
+			adMobAdView.setAdUnitId(AppConstants.MEDIATION_KEY);
+
+			adMobAdView.loadAd(adReq);
+			adMobAdView.setAdListener(new AdListener()
+			{
+				@Override
+				public void onAdLoaded()
+				{
+					adBannerLayout.setVisibility(View.VISIBLE);
+					if (adBannerLayout.getChildAt(0) != null)
+					{
+						adBannerLayout.removeViewAt(0);
+					}
+					adBannerLayout.addView(adMobAdView);
+				}
+
+				public void onAdFailedToLoad(int errorCode)
+				{
+					adBannerLayout.setVisibility(View.GONE);
+				}
+
+			});
+		}
 	}
 
 }
