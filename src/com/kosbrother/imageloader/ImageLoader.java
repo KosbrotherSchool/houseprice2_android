@@ -22,7 +22,7 @@ import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.widget.ImageView;
 
-import com.kosbrother.housefinder.R;
+import com.kosbrother.houseprice.R;
 
 public class ImageLoader
 {
