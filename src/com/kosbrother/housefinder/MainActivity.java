@@ -167,6 +167,10 @@ public class MainActivity extends SherlockFragmentActivity implements
 			@Override
 			public void onClick(View v)
 			{
+				EasyTracker easyTracker = EasyTracker
+						.getInstance(MainActivity.this);
+				easyTracker.send(MapBuilder.createEvent("Button",
+						"button_press", "focus_button", null).build());
 				getLocation(true, 1);
 			}
 		});
@@ -179,6 +183,10 @@ public class MainActivity extends SherlockFragmentActivity implements
 			@Override
 			public void onClick(View v)
 			{
+				EasyTracker easyTracker = EasyTracker
+						.getInstance(MainActivity.this);
+				easyTracker.send(MapBuilder.createEvent("Button",
+						"button_press", "dis_button", null).build());
 				showSelectDistanceDialog();
 			}
 		});
@@ -188,6 +196,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 			@Override
 			public void onClick(View v)
 			{
+
+				EasyTracker easyTracker = EasyTracker
+						.getInstance(MainActivity.this);
+				easyTracker.send(MapBuilder.createEvent("Button",
+						"button_press", "layer_button", null).build());
 
 				AlertDialog.Builder builder = new AlertDialog.Builder(
 						MainActivity.this);
@@ -237,6 +250,12 @@ public class MainActivity extends SherlockFragmentActivity implements
 			@Override
 			public void onClick(View v)
 			{
+
+				EasyTracker easyTracker = EasyTracker
+						.getInstance(MainActivity.this);
+				easyTracker.send(MapBuilder.createEvent("Button",
+						"button_press", "previous_button", null).build());
+
 				if (mPage == 0)
 				{
 					Toast.makeText(MainActivity.this, "上頁無資料",
@@ -264,6 +283,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 			@Override
 			public void onClick(View v)
 			{
+				EasyTracker easyTracker = EasyTracker
+						.getInstance(MainActivity.this);
+				easyTracker.send(MapBuilder.createEvent("Button",
+						"button_press", "next_button", null).build());
+
 				if ((mPage + 1) * 100 > Datas.mEstates.size())
 				{
 					Toast.makeText(MainActivity.this, "下頁無資料",
@@ -291,6 +315,10 @@ public class MainActivity extends SherlockFragmentActivity implements
 			@Override
 			public void onClick(View arg0)
 			{
+				EasyTracker easyTracker = EasyTracker
+						.getInstance(MainActivity.this);
+				easyTracker.send(MapBuilder.createEvent("Button",
+						"button_press", "date_button", null).build());
 				showDateDialog();
 			}
 
@@ -443,6 +471,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 			@Override
 			public void onClick(View v)
 			{
+				EasyTracker easyTracker = EasyTracker
+						.getInstance(MainActivity.this);
+				easyTracker.send(MapBuilder.createEvent("Button",
+						"button_press", "price_change_activity", null).build());
+
 				Intent intent = new Intent();
 				intent.setClass(MainActivity.this,
 						MonthPriceChangeActivity.class);
@@ -456,6 +489,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 			@Override
 			public void onClick(View v)
 			{
+				EasyTracker easyTracker = EasyTracker
+						.getInstance(MainActivity.this);
+				easyTracker.send(MapBuilder.createEvent("Button",
+						"button_press", "data_list_activity", null).build());
+
 				Intent intent = new Intent();
 				intent.setClass(MainActivity.this, ListActivity.class);
 				startActivity(intent);
@@ -468,6 +506,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 			@Override
 			public void onClick(View arg0)
 			{
+				EasyTracker easyTracker = EasyTracker
+						.getInstance(MainActivity.this);
+				easyTracker.send(MapBuilder.createEvent("Button",
+						"button_press", "find_house_activity", null).build());
+
 				Intent intent = new Intent();
 				intent.setClass(MainActivity.this, ActionBarTabs.class);
 				startActivity(intent);
@@ -524,6 +567,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 			@Override
 			public void onClick(View v)
 			{
+				EasyTracker easyTracker = EasyTracker
+						.getInstance(MainActivity.this);
+				easyTracker.send(MapBuilder.createEvent("Button",
+						"button_press", "filter_button", null).build());
+
 				Intent intent = new Intent();
 				intent.setClass(MainActivity.this, FilterActivity.class);
 				startActivity(intent);
@@ -796,6 +844,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	@Override
 	protected void onStart()
 	{
+		EasyTracker.getInstance(this).activityStart(this);
 		// TODO Auto-generated method stub
 		super.onStart();
 		if (!mLocationClient.isConnected())
@@ -808,6 +857,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	public void onStop()
 	{
 
+		EasyTracker.getInstance(this).activityStop(this);
 		// // If the client is connected
 		if (mLocationClient.isConnected())
 		{
@@ -1447,16 +1497,32 @@ public class MainActivity extends SherlockFragmentActivity implements
 					switch (position)
 					{
 					case 1:
+						EasyTracker easyTracker = EasyTracker
+								.getInstance(MainActivity.this);
+						easyTracker.send(MapBuilder.createEvent("Button",
+								"button_press", "focus_button2", null).build());
 						getLocation(true, 1);
 						mDrawerLayout.closeDrawer(leftDrawer);
 						break;
 					case 2:
+						EasyTracker easyTracker2 = EasyTracker
+								.getInstance(MainActivity.this);
+						easyTracker2
+								.send(MapBuilder.createEvent("Button",
+										"button_press", "filter_button2", null)
+										.build());
 						Intent intent = new Intent();
 						intent.setClass(MainActivity.this, FilterActivity.class);
 						startActivity(intent);
 						mDrawerLayout.closeDrawer(leftDrawer);
 						break;
 					case 4:
+						EasyTracker easyTracker3 = EasyTracker
+								.getInstance(MainActivity.this);
+						easyTracker3.send(MapBuilder.createEvent("Button",
+								"button_press", "calculator_button", null)
+								.build());
+
 						Intent intent2 = new Intent(MainActivity.this,
 								CalculatorActivity.class);
 						startActivity(intent2);
@@ -1469,12 +1535,17 @@ public class MainActivity extends SherlockFragmentActivity implements
 								"看屋高手 https://play.google.com/store/apps/details?id=com.kosbrother.houseprice");
 						startActivity(Intent.createChooser(intent3, "Share..."));
 
-						EasyTracker easyTracker2 = EasyTracker
+						EasyTracker easyTracker4 = EasyTracker
 								.getInstance(MainActivity.this);
-						easyTracker2.send(MapBuilder.createEvent("Button",
+						easyTracker4.send(MapBuilder.createEvent("Button",
 								"button_press", "share_button", null).build());
 						break;
 					case 7:
+						EasyTracker easyTracker5 = EasyTracker
+								.getInstance(MainActivity.this);
+						easyTracker5.send(MapBuilder.createEvent("Button",
+								"button_press", "star_button", null).build());
+
 						Uri uri = Uri
 								.parse("https://play.google.com/store/apps/details?id=com.kosbrother.houseprice");
 						Intent it = new Intent(Intent.ACTION_VIEW, uri);
@@ -1486,6 +1557,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 						break;
 					case 8:
 						// about us
+						EasyTracker easyTracker6 = EasyTracker
+								.getInstance(MainActivity.this);
+						easyTracker6.send(MapBuilder.createEvent("Button",
+								"button_press", "about_button", null).build());
+
 						Intent intent5 = new Intent(MainActivity.this,
 								AboutUsActivity.class);
 						startActivity(intent5);

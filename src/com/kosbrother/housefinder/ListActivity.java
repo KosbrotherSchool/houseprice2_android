@@ -29,6 +29,7 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.google.analytics.tracking.android.EasyTracker;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
@@ -561,22 +562,6 @@ public class ListActivity extends SherlockFragmentActivity
 		return super.onCreateOptionsMenu(menu);
 	}
 
-	@Override
-	public void onStart()
-	{
-		super.onStart();
-		// The rest of your onStart() code.
-		// EasyTracker.getInstance(this).activityStart(this); // Add this
-		// method.
-	}
-
-	@Override
-	public void onStop()
-	{
-		super.onStop();
-		// The rest of your onStop() code.
-		// EasyTracker.getInstance(this).activityStop(this); // Add this method.
-	}
 
 	private void showSelectDistanceDialog()
 	{
@@ -703,6 +688,20 @@ public class ListActivity extends SherlockFragmentActivity
 
 			});
 		}
+	}
+	
+	@Override
+	public void onStart()
+	{
+		super.onStart();
+		EasyTracker.getInstance(this).activityStart(this); // Add this method.
+	}
+
+	@Override
+	public void onStop()
+	{
+		super.onStop();
+		EasyTracker.getInstance(this).activityStop(this); // Add this method.
 	}
 
 }

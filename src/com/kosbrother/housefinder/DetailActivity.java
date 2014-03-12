@@ -14,6 +14,7 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.google.analytics.tracking.android.EasyTracker;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
@@ -200,8 +201,7 @@ public class DetailActivity extends SherlockFragmentActivity
 	{
 		super.onStart();
 		// The rest of your onStart() code.
-		// EasyTracker.getInstance(this).activityStart(this); // Add this
-		// method.
+		 EasyTracker.getInstance(this).activityStart(this); 
 	}
 
 	@Override
@@ -209,7 +209,7 @@ public class DetailActivity extends SherlockFragmentActivity
 	{
 		super.onStop();
 		// The rest of your onStop() code.
-		// EasyTracker.getInstance(this).activityStop(this); // Add this method.
+		 EasyTracker.getInstance(this).activityStop(this);
 	}
 
 	private void CallAds()

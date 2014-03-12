@@ -15,8 +15,6 @@
  */
 package com.kosbrother.housefinder;
 
-import com.kosbrother.housefinder.fragment.DetailFragment;
-
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
@@ -35,6 +33,8 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import com.google.analytics.tracking.android.EasyTracker;
 
 /**
  * This demonstrates the use of action bar tabs and how they interact with other
@@ -235,5 +235,19 @@ public class ActionBarTabs extends FragmentActivity
 			}
 		}
 
+	}
+	
+	@Override
+	public void onStart()
+	{
+		super.onStart();
+		EasyTracker.getInstance(this).activityStart(this); // Add this method.
+	}
+
+	@Override
+	public void onStop()
+	{
+		super.onStop();
+		EasyTracker.getInstance(this).activityStop(this); // Add this method.
 	}
 }

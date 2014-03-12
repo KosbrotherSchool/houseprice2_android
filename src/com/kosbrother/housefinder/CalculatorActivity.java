@@ -8,6 +8,7 @@ import android.widget.FrameLayout;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
+import com.google.analytics.tracking.android.EasyTracker;
 import com.kosbrother.housefinder.fragment.CalculatorFragment;
 
 public class CalculatorActivity extends SherlockFragmentActivity
@@ -54,20 +55,18 @@ public class CalculatorActivity extends SherlockFragmentActivity
 		return super.onOptionsItemSelected(item);
 	}
 
-//	@Override
-//	public void onStart()
-//	{
-//		super.onStart();
-//		// The rest of your onStart() code.
-//		EasyTracker.getInstance(this).activityStart(this); // Add this method.
-//	}
-//
-//	@Override
-//	public void onStop()
-//	{
-//		super.onStop();
-//		// The rest of your onStop() code.
-//		EasyTracker.getInstance(this).activityStop(this); // Add this method.
-//	}
+	@Override
+	public void onStart()
+	{
+		super.onStart();
+		EasyTracker.getInstance(this).activityStart(this); // Add this method.
+	}
+
+	@Override
+	public void onStop()
+	{
+		super.onStop();
+		EasyTracker.getInstance(this).activityStop(this); // Add this method.
+	}
 	
 }
