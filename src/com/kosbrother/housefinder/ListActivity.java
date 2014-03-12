@@ -61,7 +61,13 @@ public class ListActivity extends SherlockFragmentActivity
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.actiity_list);
-
+		
+		if (Datas.mEstatesMap == null)
+		{
+			Toast.makeText(ListActivity.this, "無資料!", Toast.LENGTH_SHORT).show();
+			finish();
+		}
+		
 		yearMonthLinearLayout = (LinearLayout) findViewById(R.id.year_month_linear_layout);
 		titleLinearLayout = (LinearLayout) findViewById(R.id.title_linear_layout);
 		yearMonthLinearLayout.setVisibility(View.VISIBLE);

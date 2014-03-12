@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.kosbrother.housefinder.api.InfoParserApi;
 
@@ -29,7 +30,13 @@ public class MonthPriceChangeActivity extends Activity implements
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_price_change);
-
+		
+		if (Datas.mEstatesMap == null)
+		{
+			Toast.makeText(MonthPriceChangeActivity.this, "無資料!", Toast.LENGTH_SHORT).show();
+			finish();
+		}
+		
 		monthItemLayout = (LinearLayout) findViewById(R.id.month_item_layout);
 		mInflater = getLayoutInflater();
 		priceChangeText = (TextView) findViewById(R.id.price_change_text);

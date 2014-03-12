@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
-import android.R.integer;
 import android.app.ActivityManager;
 import android.app.ActivityManager.MemoryInfo;
 import android.app.AlertDialog;
@@ -61,6 +60,8 @@ import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.MapBuilder;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -1428,7 +1429,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 		items.add(new SectionItem("房貸計算"));
 		items.add(new EntryItem("房貸計算機", R.drawable.icon_calculator));
 		items.add(new SectionItem("其他"));
-		items.add(new EntryItem("設定", R.drawable.icon_setting));
+		items.add(new EntryItem("推薦", R.drawable.icon_recommend));
+		items.add(new EntryItem("給評(星星)", R.drawable.icon_star3));
 		items.add(new EntryItem("關於我們", R.drawable.icon_about));
 
 		mDrawerAdapter = new EntryAdapter(MainActivity.this, items);
@@ -1461,16 +1463,32 @@ public class MainActivity extends SherlockFragmentActivity implements
 						mDrawerLayout.closeDrawer(leftDrawer);
 						break;
 					case 6:
-						// setting activity
-						// Intent intent1 = new Intent(MainActivity.this,
-						// SettingActivity.class);
-						// startActivity(intent1);
+						Intent intent3 = new Intent(Intent.ACTION_SEND);
+						intent3.setType("text/plain");
+						intent3.putExtra(Intent.EXTRA_TEXT,
+								"看屋高手 https://play.google.com/store/apps/details?id=com.kosbrother.houseprice");
+						startActivity(Intent.createChooser(intent3, "Share..."));
+
+						EasyTracker easyTracker2 = EasyTracker
+								.getInstance(MainActivity.this);
+						easyTracker2.send(MapBuilder.createEvent("Button",
+								"button_press", "share_button", null).build());
 						break;
 					case 7:
+						Uri uri = Uri
+								.parse("https://play.google.com/store/apps/details?id=com.kosbrother.houseprice");
+						Intent it = new Intent(Intent.ACTION_VIEW, uri);
+						startActivity(it);
+						Setting.saveBooleanSetting(Setting.KeyGiveStar, true,
+								MainActivity.this);
+						Setting.saveBooleanSetting(Setting.KeyPushStarDialog,
+								false, MainActivity.this);
+						break;
+					case 8:
 						// about us
-						Intent intent3 = new Intent(MainActivity.this,
+						Intent intent5 = new Intent(MainActivity.this,
 								AboutUsActivity.class);
-						startActivity(intent3);
+						startActivity(intent5);
 						break;
 					default:
 						break;
