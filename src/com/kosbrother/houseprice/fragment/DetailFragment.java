@@ -92,7 +92,7 @@ public class DetailFragment extends Fragment
 	private TextView text_buiding_type;
 	private LinearLayout buildingRoomsLayout;
 	private LinearLayout detailEstateContentLayout;
-	
+
 	// ground detail
 	private LinearLayout groundDetailLayout;
 
@@ -101,7 +101,7 @@ public class DetailFragment extends Fragment
 
 	// parking detail
 	private LinearLayout parkingDetailLayout;
-	
+
 	private ProgressDialog mProgressDialog;
 
 	@Override
@@ -130,15 +130,17 @@ public class DetailFragment extends Fragment
 				.findViewById(R.id.text_detail_buy_total_price);
 		text_buiding_type = (TextView) v
 				.findViewById(R.id.text_detail_building_type);
-		buildingRoomsLayout = (LinearLayout) v.findViewById(R.id.rooms_linear_layout);
-		detailEstateContentLayout = (LinearLayout) v.findViewById(R.id.detail_estate_content_layout);
-		
+		buildingRoomsLayout = (LinearLayout) v
+				.findViewById(R.id.rooms_linear_layout);
+		detailEstateContentLayout = (LinearLayout) v
+				.findViewById(R.id.detail_estate_content_layout);
+
 		groundDetailLayout = (LinearLayout) v.findViewById(R.id.layout_ground);
 		buildingDetailLayout = (LinearLayout) v
 				.findViewById(R.id.layout_building);
 		parkingDetailLayout = (LinearLayout) v
 				.findViewById(R.id.layout_parking);
-		
+
 		// set image
 		String x_long = Double.toString(theEstate.x_long);
 		String y_lat = Double.toString(theEstate.y_lat);
@@ -191,76 +193,48 @@ public class DetailFragment extends Fragment
 
 			if (isGotData)
 			{
-				detailEstateContentLayout.setVisibility(View.VISIBLE);
-				for (int i = 0; i < Datas.mDetailEstates.size(); i++)
+				if (isAdded())
 				{
-					RealEstate tEstate = Datas.mDetailEstates.get(i);
-					if (theEstate.estate_id == tEstate.estate_id)
+
+					detailEstateContentLayout.setVisibility(View.VISIBLE);
+					for (int i = 0; i < Datas.mDetailEstates.size(); i++)
 					{
-						theEstate = tEstate;
-					}
-				}
-
-				text_address.setText(theEstate.estate_address);
-				int year = theEstate.exchange_date / 100;
-				int month = theEstate.exchange_date % 100;
-				text_date.setText(Integer.toString(year) + "/"
-						+ Integer.toString(month));
-				text_estate_type.setText(InfoParserApi
-						.parseGroundType(theEstate.ground_type_id));
-				text_buiding_type.setText(InfoParserApi
-						.parseBuildingType(theEstate.building_type_id));
-
-				text_content_buy.setText(theEstate.exchange_content);
-
-				text_ground_exchange_area.setText(Double
-						.toString(theEstate.total_area) + "坪");
-				
-				if (theEstate.building_rooms.equals(""))
-				{
-					buildingRoomsLayout.setVisibility(View.GONE);
-				}else {
-					text_building_rooms.setText(theEstate.building_rooms);
-				}
-				
-				
-				text_buy_per_square_feet.setText(Double
-						.toString(theEstate.square_price) + "萬");
-				text_buy_total_price.setText(Integer
-						.toString(theEstate.total_price) + "萬");
-
-				if (Datas.mLandDatas.size() == 0)
-				{
-					TextView noDataTextView = new TextView(getActivity());
-					noDataTextView.setText("無資料");
-					noDataTextView.setTextSize(text_size);
-					noDataTextView.setTextColor(getResources().getColor(
-							R.color.white));
-					groundDetailLayout.addView(noDataTextView);
-				} else
-				{
-					Boolean isHasData = false;
-					int num = 0;
-					for (int i = 0; i < Datas.mLandDatas.size(); i++)
-					{
-						LandData theLandData = Datas.mLandDatas.get(i);
-						if (theLandData.estate_id == theEstate.estate_id)
+						RealEstate tEstate = Datas.mDetailEstates.get(i);
+						if (theEstate.estate_id == tEstate.estate_id)
 						{
-							num = num + 1;
-							isHasData = true;
-							TextView noDataTextView = new TextView(
-									getActivity());
-							noDataTextView.setText("第" + Integer.valueOf(num)
-									+ "筆資料");
-							noDataTextView.setTextSize(text_size);
-							noDataTextView.setTextColor(getResources()
-									.getColor(R.color.light_blue));
-							groundDetailLayout.addView(noDataTextView);
-							addLandData(theLandData);
-
+							theEstate = tEstate;
 						}
 					}
-					if (!isHasData)
+
+					text_address.setText(theEstate.estate_address);
+					int year = theEstate.exchange_date / 100;
+					int month = theEstate.exchange_date % 100;
+					text_date.setText(Integer.toString(year) + "/"
+							+ Integer.toString(month));
+					text_estate_type.setText(InfoParserApi
+							.parseGroundType(theEstate.ground_type_id));
+					text_buiding_type.setText(InfoParserApi
+							.parseBuildingType(theEstate.building_type_id));
+
+					text_content_buy.setText(theEstate.exchange_content);
+
+					text_ground_exchange_area.setText(Double
+							.toString(theEstate.total_area) + "坪");
+
+					if (theEstate.building_rooms.equals(""))
+					{
+						buildingRoomsLayout.setVisibility(View.GONE);
+					} else
+					{
+						text_building_rooms.setText(theEstate.building_rooms);
+					}
+
+					text_buy_per_square_feet.setText(Double
+							.toString(theEstate.square_price) + "萬");
+					text_buy_total_price.setText(Integer
+							.toString(theEstate.total_price) + "萬");
+
+					if (Datas.mLandDatas.size() == 0)
 					{
 						TextView noDataTextView = new TextView(getActivity());
 						noDataTextView.setText("無資料");
@@ -268,42 +242,42 @@ public class DetailFragment extends Fragment
 						noDataTextView.setTextColor(getResources().getColor(
 								R.color.white));
 						groundDetailLayout.addView(noDataTextView);
-					}
-				}
-
-				if (Datas.mBuildingDatas.size() == 0)
-				{
-					TextView noDataTextView = new TextView(getActivity());
-					noDataTextView.setText("無資料");
-					noDataTextView.setTextSize(text_size);
-					noDataTextView.setTextColor(getResources().getColor(
-							R.color.white));
-					buildingDetailLayout.addView(noDataTextView);
-
-				} else
-				{
-					Boolean isHasData = false;
-					int num = 0;
-					for (int i = 0; i < Datas.mBuildingDatas.size(); i++)
+					} else
 					{
-						BuildingData theBuildingData = Datas.mBuildingDatas
-								.get(i);
-						if (theBuildingData.estate_id == theEstate.estate_id)
+						Boolean isHasData = false;
+						int num = 0;
+						for (int i = 0; i < Datas.mLandDatas.size(); i++)
 						{
-							num = num + 1;
-							isHasData = true;
+							LandData theLandData = Datas.mLandDatas.get(i);
+							if (theLandData.estate_id == theEstate.estate_id)
+							{
+								num = num + 1;
+								isHasData = true;
+								TextView noDataTextView = new TextView(
+										getActivity());
+								noDataTextView.setText("第"
+										+ Integer.valueOf(num) + "筆資料");
+								noDataTextView.setTextSize(text_size);
+								noDataTextView.setTextColor(getResources()
+										.getColor(R.color.light_blue));
+								groundDetailLayout.addView(noDataTextView);
+								addLandData(theLandData);
+
+							}
+						}
+						if (!isHasData)
+						{
 							TextView noDataTextView = new TextView(
 									getActivity());
-							noDataTextView.setText("第" + Integer.valueOf(num)
-									+ "筆資料");
+							noDataTextView.setText("無資料");
 							noDataTextView.setTextSize(text_size);
 							noDataTextView.setTextColor(getResources()
-									.getColor(R.color.light_blue));
-							buildingDetailLayout.addView(noDataTextView);
-							addBuildingData(theBuildingData);
+									.getColor(R.color.white));
+							groundDetailLayout.addView(noDataTextView);
 						}
 					}
-					if (!isHasData)
+
+					if (Datas.mBuildingDatas.size() == 0)
 					{
 						TextView noDataTextView = new TextView(getActivity());
 						noDataTextView.setText("無資料");
@@ -311,40 +285,43 @@ public class DetailFragment extends Fragment
 						noDataTextView.setTextColor(getResources().getColor(
 								R.color.white));
 						buildingDetailLayout.addView(noDataTextView);
-					}
-				}
 
-				if (Datas.mParkingDatas.size() == 0)
-				{
-					TextView noDataTextView = new TextView(getActivity());
-					noDataTextView.setText("無資料");
-					noDataTextView.setTextSize(text_size);
-					noDataTextView.setTextColor(getResources().getColor(
-							R.color.white));
-					parkingDetailLayout.addView(noDataTextView);
-				} else
-				{
-					Boolean isHasData = false;
-					int num = 0;
-					for (int j = 0; j < Datas.mParkingDatas.size(); j++)
+					} else
 					{
-						ParkingData theParkingData = Datas.mParkingDatas.get(j);
-						if (theParkingData.estate_id == theEstate.estate_id)
+						Boolean isHasData = false;
+						int num = 0;
+						for (int i = 0; i < Datas.mBuildingDatas.size(); i++)
 						{
-							num = num + 1;
-							isHasData = true;
+							BuildingData theBuildingData = Datas.mBuildingDatas
+									.get(i);
+							if (theBuildingData.estate_id == theEstate.estate_id)
+							{
+								num = num + 1;
+								isHasData = true;
+								TextView noDataTextView = new TextView(
+										getActivity());
+								noDataTextView.setText("第"
+										+ Integer.valueOf(num) + "筆資料");
+								noDataTextView.setTextSize(text_size);
+								noDataTextView.setTextColor(getResources()
+										.getColor(R.color.light_blue));
+								buildingDetailLayout.addView(noDataTextView);
+								addBuildingData(theBuildingData);
+							}
+						}
+						if (!isHasData)
+						{
 							TextView noDataTextView = new TextView(
 									getActivity());
-							noDataTextView.setText("第" + Integer.valueOf(num)
-									+ "筆資料");
+							noDataTextView.setText("無資料");
 							noDataTextView.setTextSize(text_size);
 							noDataTextView.setTextColor(getResources()
-									.getColor(R.color.light_blue));
-							parkingDetailLayout.addView(noDataTextView);
-							addParkingData(theParkingData);
+									.getColor(R.color.white));
+							buildingDetailLayout.addView(noDataTextView);
 						}
 					}
-					if (!isHasData)
+
+					if (Datas.mParkingDatas.size() == 0)
 					{
 						TextView noDataTextView = new TextView(getActivity());
 						noDataTextView.setText("無資料");
@@ -352,6 +329,39 @@ public class DetailFragment extends Fragment
 						noDataTextView.setTextColor(getResources().getColor(
 								R.color.white));
 						parkingDetailLayout.addView(noDataTextView);
+					} else
+					{
+						Boolean isHasData = false;
+						int num = 0;
+						for (int j = 0; j < Datas.mParkingDatas.size(); j++)
+						{
+							ParkingData theParkingData = Datas.mParkingDatas
+									.get(j);
+							if (theParkingData.estate_id == theEstate.estate_id)
+							{
+								num = num + 1;
+								isHasData = true;
+								TextView noDataTextView = new TextView(
+										getActivity());
+								noDataTextView.setText("第"
+										+ Integer.valueOf(num) + "筆資料");
+								noDataTextView.setTextSize(text_size);
+								noDataTextView.setTextColor(getResources()
+										.getColor(R.color.light_blue));
+								parkingDetailLayout.addView(noDataTextView);
+								addParkingData(theParkingData);
+							}
+						}
+						if (!isHasData)
+						{
+							TextView noDataTextView = new TextView(
+									getActivity());
+							noDataTextView.setText("無資料");
+							noDataTextView.setTextSize(text_size);
+							noDataTextView.setTextColor(getResources()
+									.getColor(R.color.white));
+							parkingDetailLayout.addView(noDataTextView);
+						}
 					}
 				}
 
