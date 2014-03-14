@@ -18,7 +18,7 @@
     	<TextView android:id="@+id/text_marker_price"
     	    android:layout_width="wrap_content"
     	    android:layout_height="wrap_content"
-    	    android:textSize="8dp"
+    	    android:textSize="10dp"
     	    android:text="777"
     	    android:background="@drawable/marker_background"
     	    android:paddingLeft="5dp"

@@ -297,6 +297,14 @@ public class ListActivity extends FragmentActivity
 		 CallAds();
 	}
 
+	
+	@Override
+	protected void onResume()
+	{
+		// TODO Auto-generated method stub
+		super.onResume();
+	}
+	
 	private void setDateButtonText()
 	{
 		int startYear = AppConstants.startDate / 100;
@@ -430,6 +438,15 @@ public class ListActivity extends FragmentActivity
 
 			} else
 			{
+				Datas.mEstates = new ArrayList<RealEstate>();
+				Datas.mEstatesMap = getRealEstatesMap(Datas.mEstates);
+				NUM_ITEMS = Datas.mArrayKey.size();
+				mAdapter = new MyAdapter(getSupportFragmentManager());
+				mPager.setAdapter(mAdapter);
+				mPager.setCurrentItem(NUM_ITEMS - 1);
+				yearMonthTextView.setText(makeYearMonthString(Datas
+						.getKeyByPosition(NUM_ITEMS - 1)));
+				
 				Toast.makeText(ListActivity.this, "無資料~", Toast.LENGTH_SHORT)
 						.show();
 				// titleTextView.setText("無資料~");

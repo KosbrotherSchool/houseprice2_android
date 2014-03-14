@@ -79,6 +79,10 @@ public class BreiefFragment extends Fragment
 	{	
 		ArrayList<RealEstate> theEstates = new ArrayList<RealEstate>();
 		theEstates = Datas.mEstatesMap.get(Datas.getKeyByPosition(mPosition));
+		if (theEstates == null || theEstates.size() == 0)
+		{
+			theEstates = new ArrayList<RealEstate>();
+		}
 		DetailListAdapter newAdapter = new DetailListAdapter(getActivity(), theEstates, mPosition);
 		detailListView.setAdapter(newAdapter);
 	}

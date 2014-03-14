@@ -1138,7 +1138,15 @@ public class MainActivity extends FragmentActivity implements
 				// }
 
 			} else
-			{
+			{	
+				Datas.mEstates = new ArrayList<RealEstate>();
+				mPage = 0;
+
+				Datas.mEstatesMap = getRealEstatesMap(Datas.mEstates);
+				setTitleText(mPage);
+				
+				new addMarkerTask().execute();
+				
 				Toast.makeText(MainActivity.this, "無資料~", Toast.LENGTH_SHORT)
 						.show();
 				titleTextView.setText("無資料~");
