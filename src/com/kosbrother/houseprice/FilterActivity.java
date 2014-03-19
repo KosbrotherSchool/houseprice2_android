@@ -3,6 +3,7 @@ package com.kosbrother.houseprice;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
@@ -83,12 +84,12 @@ public class FilterActivity extends FragmentActivity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_filter);
 
-//		boolean isFirstOpen = Setting.getFirstBoolean(FilterActivity.this);
-//		if (isFirstOpen)
-//		{
-//			// Toast.makeText(this, "請先設定搜索條件", Toast.LENGTH_SHORT).show();
-//			Setting.setFirstBoolean(FilterActivity.this);
-//		}
+		// boolean isFirstOpen = Setting.getFirstBoolean(FilterActivity.this);
+		// if (isFirstOpen)
+		// {
+		// // Toast.makeText(this, "請先設定搜索條件", Toast.LENGTH_SHORT).show();
+		// Setting.setFirstBoolean(FilterActivity.this);
+		// }
 
 		lowHousePriceEditText = (EditText) findViewById(R.id.low_house_price_edit);
 		highHousePriceEditText = (EditText) findViewById(R.id.high_house_price_edit);
@@ -160,6 +161,7 @@ public class FilterActivity extends FragmentActivity
 			public void onClick(View v)
 			{
 				MainActivity.isReSearch = true;
+				MainActivity.isBackFromFilter = true;
 				// purpose
 				String valuePurpose = "";
 				if (radioBuy.isChecked())
@@ -335,8 +337,6 @@ public class FilterActivity extends FragmentActivity
 					Setting.saveSetting(Setting.keyAreaMax, areaMaxEditText
 							.getText().toString(), FilterActivity.this);
 				}
-				
-				
 
 				finish();
 			}
@@ -377,9 +377,11 @@ public class FilterActivity extends FragmentActivity
 
 		mActionBar = getActionBar();
 		mActionBar.setTitle("看屋高手---搜索設定");
-		mActionBar.setDisplayHomeAsUpEnabled(true);
-		mActionBar.setHomeButtonEnabled(true);
-		
+		if (Build.VERSION.SDK_INT >= 14)
+		{
+			mActionBar.setDisplayHomeAsUpEnabled(true);
+			mActionBar.setHomeButtonEnabled(true);
+		}
 		stringPurpose = Setting.getSetting(Setting.keyPurpose, this);
 		minHousePriceString = Setting
 				.getSetting(Setting.keyHousePriceMin, this);
@@ -569,21 +571,21 @@ public class FilterActivity extends FragmentActivity
 		CallAds();
 
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
 		switch (item.getItemId())
 		{
-		   case android.R.id.home:
-	            finish();             
-	            return true;    
+		case android.R.id.home:
+			finish();
+			return true;
 		default:
 			break;
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
+
 	private void setCheckAllBuildingType(CheckBox building_type)
 	{
 		building_type.setOnCheckedChangeListener(new OnCheckedChangeListener()
@@ -704,7 +706,8 @@ public class FilterActivity extends FragmentActivity
 
 	private void CallAds()
 	{
-		boolean isGivenStar = Setting.getBooleanSetting(Setting.KeyGiveStar, FilterActivity.this);
+		boolean isGivenStar = Setting.getBooleanSetting(Setting.KeyGiveStar,
+				FilterActivity.this);
 
 		if (!isGivenStar)
 		{
@@ -741,7 +744,7 @@ public class FilterActivity extends FragmentActivity
 			});
 		}
 	}
-	
+
 	@Override
 	public void onStart()
 	{

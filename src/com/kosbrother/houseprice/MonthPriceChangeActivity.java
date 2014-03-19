@@ -6,6 +6,7 @@ import android.app.ActionBar;
 import android.app.ActionBar.OnNavigationListener;
 import android.app.Activity;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -31,32 +32,35 @@ public class MonthPriceChangeActivity extends Activity implements
 	private LinearLayout monthItemLayout;
 	private LayoutInflater mInflater;
 	private TextView priceChangeText;
-	
+
 	private RelativeLayout adBannerLayout;
 	private AdView adMobAdView;
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_price_change);
-		
+
 		if (Datas.mEstatesMap == null)
 		{
-			Toast.makeText(MonthPriceChangeActivity.this, "無資料!", Toast.LENGTH_SHORT).show();
+			Toast.makeText(MonthPriceChangeActivity.this, "無資料!",
+					Toast.LENGTH_SHORT).show();
 			finish();
 		}
-		
+
 		monthItemLayout = (LinearLayout) findViewById(R.id.month_item_layout);
 		mInflater = getLayoutInflater();
 		priceChangeText = (TextView) findViewById(R.id.price_change_text);
-		
+
 		final ActionBar actionBar = getActionBar();
 		actionBar.setDisplayShowTitleEnabled(false);
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-		actionBar.setDisplayHomeAsUpEnabled(true);
-		actionBar.setHomeButtonEnabled(true);
-		
+		if (Build.VERSION.SDK_INT >= 14)
+		{
+			actionBar.setDisplayHomeAsUpEnabled(true);
+			actionBar.setHomeButtonEnabled(true);
+		}
 		ArrayList<String> itemList = new ArrayList<String>();
 		itemList.add("單價");
 		itemList.add("總價");
@@ -99,21 +103,21 @@ public class MonthPriceChangeActivity extends Activity implements
 		CallAds();
 
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
 		switch (item.getItemId())
 		{
-		   case android.R.id.home:
-	            finish();             
-	            return true;    
+		case android.R.id.home:
+			finish();
+			return true;
 		default:
 			break;
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
+
 	@Override
 	public boolean onNavigationItemSelected(int itemPosition, long itemId)
 	{
@@ -155,24 +159,24 @@ public class MonthPriceChangeActivity extends Activity implements
 					.findViewById(R.id.price_month_change_text);
 			TextView priceQuantityTextView = (TextView) view
 					.findViewById(R.id.price_month_quantity_text);
-				
+
 			String monthKey = Datas.getKeyByPosition(i);
 			monthYearTextView.setText(InfoParserApi.parseMonthKey(monthKey));
-			
+
 			int hp1 = Datas.getMonthHighTotalPrice(monthKey);
-			priceHighTextView.setText(Integer.toString(hp1)+ "萬");
-			
+			priceHighTextView.setText(Integer.toString(hp1) + "萬");
+
 			int avg1 = Datas.getMonthAvgTotalPrice(monthKey);
 			priceAvgTextView.setText(Integer.toString(avg1) + "萬");
-			
+
 			int lp1 = Datas.getMonthLowTotalPrice(monthKey);
-			priceLowTextView.setText(Integer.toString(lp1)+ "萬");
-			
+			priceLowTextView.setText(Integer.toString(lp1) + "萬");
+
 			int num1 = Datas.getMonthEstatesNum(monthKey);
 			priceQuantityTextView.setText(Integer.toString(num1));
-			
+
 			priceChangeTextView.setVisibility(View.GONE);
-			
+
 			monthItemLayout.addView(view);
 		}
 
@@ -207,18 +211,18 @@ public class MonthPriceChangeActivity extends Activity implements
 
 			double avg = Datas.getMonthAvgSquarePrice(monthKey);
 			priceAvgTextView.setText(InfoParserApi.parseSquarePrice(avg));
-			
+
 			try
 			{
-				String monthKey2 = Datas.getKeyByPosition(i-1);
+				String monthKey2 = Datas.getKeyByPosition(i - 1);
 				double priceChange1 = Datas.getSquarePriceChange(monthKey,
-				monthKey2);
-				priceChangeTextView.setText(InfoParserApi.parsePriceChangePercent(priceChange1));
+						monthKey2);
+				priceChangeTextView.setText(InfoParserApi
+						.parsePriceChangePercent(priceChange1));
 			} catch (Exception e)
 			{
 				priceChangeTextView.setText("~");
 			}
-			
 
 			double lp = Datas.getMonthLowSquarePrice(monthKey);
 			priceLowTextView.setText(InfoParserApi.parseSquarePrice(lp));
@@ -230,7 +234,7 @@ public class MonthPriceChangeActivity extends Activity implements
 		}
 
 	}
-	
+
 	@Override
 	public void onStart()
 	{
@@ -244,10 +248,11 @@ public class MonthPriceChangeActivity extends Activity implements
 		super.onStop();
 		EasyTracker.getInstance(this).activityStop(this); // Add this method.
 	}
-	
+
 	private void CallAds()
 	{
-		boolean isGivenStar = Setting.getBooleanSetting(Setting.KeyGiveStar, MonthPriceChangeActivity.this);
+		boolean isGivenStar = Setting.getBooleanSetting(Setting.KeyGiveStar,
+				MonthPriceChangeActivity.this);
 
 		if (!isGivenStar)
 		{

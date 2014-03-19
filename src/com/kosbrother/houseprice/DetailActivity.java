@@ -1,6 +1,7 @@
 package com.kosbrother.houseprice;
 
 import android.app.ActionBar;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -40,14 +41,14 @@ public class DetailActivity extends FragmentActivity
 		Bundle bundle = getIntent().getExtras();
 		int position = bundle.getInt("RowNumber");
 		mMonthKey = bundle.getString("MonthKey");
-		
+
 		if (mMonthKey.equals(""))
 		{
 			NUM_ITEMS = Datas.mEstates.size();
-		}else {
+		} else
+		{
 			NUM_ITEMS = Datas.mEstatesMap.get(mMonthKey).size();
 		}
-		
 
 		mAdapter = new MyAdapter(getSupportFragmentManager());
 
@@ -59,8 +60,11 @@ public class DetailActivity extends FragmentActivity
 		mActionBar = getActionBar();
 
 		// enable ActionBar app icon to behave as action to toggle nav drawer
-		mActionBar.setDisplayHomeAsUpEnabled(true);
-		mActionBar.setHomeButtonEnabled(true);
+		if (Build.VERSION.SDK_INT >= 14)
+		{
+			mActionBar.setDisplayHomeAsUpEnabled(true);
+			mActionBar.setHomeButtonEnabled(true);
+		}
 		mActionBar.setTitle("第" + Integer.toString(position + 1) + "/"
 				+ Integer.toString(NUM_ITEMS) + "筆資料");
 
@@ -201,7 +205,7 @@ public class DetailActivity extends FragmentActivity
 	{
 		super.onStart();
 		// The rest of your onStart() code.
-		 EasyTracker.getInstance(this).activityStart(this); 
+		EasyTracker.getInstance(this).activityStart(this);
 	}
 
 	@Override
@@ -209,12 +213,13 @@ public class DetailActivity extends FragmentActivity
 	{
 		super.onStop();
 		// The rest of your onStop() code.
-		 EasyTracker.getInstance(this).activityStop(this);
+		EasyTracker.getInstance(this).activityStop(this);
 	}
 
 	private void CallAds()
 	{
-		boolean isGivenStar = Setting.getBooleanSetting(Setting.KeyGiveStar, DetailActivity.this);
+		boolean isGivenStar = Setting.getBooleanSetting(Setting.KeyGiveStar,
+				DetailActivity.this);
 
 		if (!isGivenStar)
 		{

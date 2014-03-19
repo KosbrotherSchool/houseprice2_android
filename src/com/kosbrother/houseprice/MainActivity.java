@@ -21,6 +21,7 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.DialogFragment;
@@ -139,6 +140,7 @@ public class MainActivity extends FragmentActivity implements
 
 	public static boolean isReSearch = true;
 	public static boolean isResetView = false;
+	public static boolean isBackFromFilter = false;
 
 	// private DatabaseHelper databaseHelper = null;
 
@@ -559,8 +561,13 @@ public class MainActivity extends FragmentActivity implements
 				GravityCompat.START);
 
 		// enable ActionBar app icon to behave as action to toggle nav drawer
-		getActionBar().setDisplayHomeAsUpEnabled(true);
-		getActionBar().setHomeButtonEnabled(true);
+		if (Build.VERSION.SDK_INT >= 14)
+		{
+//			Toast.makeText(this, Integer.toString(Build.VERSION.SDK_INT), Toast.LENGTH_SHORT).show();
+			getActionBar().setDisplayHomeAsUpEnabled(true);
+			getActionBar().setHomeButtonEnabled(true);
+		}
+		
 
 		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
 				R.drawable.ic_drawer, R.string.drawer_open,
@@ -731,6 +738,12 @@ public class MainActivity extends FragmentActivity implements
 										if (actionId == EditorInfo.IME_ACTION_SEARCH
 												|| event.getKeyCode() == KeyEvent.KEYCODE_ENTER)
 										{
+											
+											EasyTracker easyTracker = EasyTracker
+													.getInstance(MainActivity.this);
+											easyTracker.send(MapBuilder.createEvent("Button",
+													"button_press", "search_button", null).build());
+											
 											String inputString = v.getText()
 													.toString();
 											Geocoder geocoder = new Geocoder(
@@ -811,7 +824,14 @@ public class MainActivity extends FragmentActivity implements
 		// TODO Auto-generated method stub
 		if (isReSearch)
 		{
-			getLocation(true, 0);
+			if (isBackFromFilter)
+			{
+				getLocation(false, 0);
+				isBackFromFilter = false;
+			}else {
+				getLocation(true, 0);			
+			}
+			
 			isReSearch = false;
 		}
 	}

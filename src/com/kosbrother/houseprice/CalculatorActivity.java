@@ -1,5 +1,6 @@
 package com.kosbrother.houseprice;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -28,17 +29,20 @@ public class CalculatorActivity extends FragmentActivity
 
 		if (savedInstanceState == null)
 		{
-			
+
 			Fragment newFragment = new CalculatorFragment();
 			FragmentTransaction ft = getSupportFragmentManager()
 					.beginTransaction();
 			ft.add(CONTENT_VIEW_ID, newFragment).commit();
 		}
-		
-		getActionBar().setDisplayHomeAsUpEnabled(true);
-		getActionBar().setHomeButtonEnabled(true);
+
+		if (Build.VERSION.SDK_INT >= 14)
+		{
+			getActionBar().setDisplayHomeAsUpEnabled(true);
+			getActionBar().setHomeButtonEnabled(true);
+		}
 		getActionBar().setTitle("房貸計算");
-		
+
 	}
 
 	@Override
@@ -46,9 +50,9 @@ public class CalculatorActivity extends FragmentActivity
 	{
 		switch (item.getItemId())
 		{
-		   case android.R.id.home:
-	            finish();             
-	            return true;    
+		case android.R.id.home:
+			finish();
+			return true;
 		default:
 			break;
 		}
@@ -68,5 +72,5 @@ public class CalculatorActivity extends FragmentActivity
 		super.onStop();
 		EasyTracker.getInstance(this).activityStop(this); // Add this method.
 	}
-	
+
 }

@@ -2,6 +2,7 @@ package com.kosbrother.houseprice;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,17 +28,23 @@ public class AboutUsActivity extends Activity
 			@Override
 			public void onClick(View v)
 			{
-				final Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
-	            emailIntent.setType("plain/text");
-	            emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL, new String[] { "kosbrotherschool@gmail.com" });
-	            emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "聯絡我們 from 實價登錄");
-	            emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, "");
-	            startActivity(Intent.createChooser(emailIntent, "Send mail..."));
+				final Intent emailIntent = new Intent(
+						android.content.Intent.ACTION_SEND);
+				emailIntent.setType("plain/text");
+				emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL,
+						new String[] { "kosbrotherschool@gmail.com" });
+				emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
+						"聯絡我們 from 實價登錄");
+				emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, "");
+				startActivity(Intent.createChooser(emailIntent, "Send mail..."));
 			}
 		});
 
-		getActionBar().setDisplayHomeAsUpEnabled(true);
-		getActionBar().setHomeButtonEnabled(true);
+		if (Build.VERSION.SDK_INT >= 14)
+		{
+			getActionBar().setDisplayHomeAsUpEnabled(true);
+			getActionBar().setHomeButtonEnabled(true);
+		}
 
 	}
 
@@ -54,21 +61,21 @@ public class AboutUsActivity extends Activity
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
-//	@Override
-//	public void onStart()
-//	{
-//		super.onStart();
-//		// The rest of your onStart() code.
-//		EasyTracker.getInstance(this).activityStart(this); // Add this method.
-//	}
-//
-//	@Override
-//	public void onStop()
-//	{
-//		super.onStop();
-//		// The rest of your onStop() code.
-//		EasyTracker.getInstance(this).activityStop(this); // Add this method.
-//	}
+
+	// @Override
+	// public void onStart()
+	// {
+	// super.onStart();
+	// // The rest of your onStart() code.
+	// EasyTracker.getInstance(this).activityStart(this); // Add this method.
+	// }
+	//
+	// @Override
+	// public void onStop()
+	// {
+	// super.onStop();
+	// // The rest of your onStop() code.
+	// EasyTracker.getInstance(this).activityStop(this); // Add this method.
+	// }
 
 }

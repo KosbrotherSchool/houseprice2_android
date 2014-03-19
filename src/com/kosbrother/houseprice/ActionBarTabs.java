@@ -20,6 +20,7 @@ import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.KeyEvent;
@@ -49,10 +50,10 @@ import com.google.android.gms.ads.AdView;
 @SuppressLint("ValidFragment")
 public class ActionBarTabs extends FragmentActivity
 {
-	
+
 	private RelativeLayout adBannerLayout;
 	private AdView adMobAdView;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -63,9 +64,11 @@ public class ActionBarTabs extends FragmentActivity
 		ActionBar actionBar = getActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		// actionBar.setDisplayShowTitleEnabled(false);
-		actionBar.setDisplayHomeAsUpEnabled(true);
-		actionBar.setHomeButtonEnabled(true);
-		
+		if (Build.VERSION.SDK_INT >= 14)
+		{
+			actionBar.setDisplayHomeAsUpEnabled(true);
+			actionBar.setHomeButtonEnabled(true);
+		}
 		actionBar.addTab(actionBar
 				.newTab()
 				.setText("永慶房屋")
@@ -76,7 +79,7 @@ public class ActionBarTabs extends FragmentActivity
 				.newTab()
 				.setText("信義房屋")
 				.setTabListener(
-						new TabListener("http://m.sinyi.com.tw/", "SinYi")));	
+						new TabListener("http://m.sinyi.com.tw/", "SinYi")));
 		actionBar.addTab(actionBar
 				.newTab()
 				.setText("591租屋")
@@ -87,21 +90,21 @@ public class ActionBarTabs extends FragmentActivity
 		CallAds();
 
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
 		switch (item.getItemId())
 		{
-		   case android.R.id.home:
-	            finish();             
-	            return true;    
+		case android.R.id.home:
+			finish();
+			return true;
 		default:
 			break;
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
+
 	/**
 	 * A TabListener receives event callbacks from the action bar as tabs are
 	 * deselected, selected, and reselected. A FragmentTransaction is provided
@@ -131,7 +134,7 @@ public class ActionBarTabs extends FragmentActivity
 		{
 			if (mFragment == null)
 			{
-				mFragment = TabContentFragment.newInstance(mURL,mTag);
+				mFragment = TabContentFragment.newInstance(mURL, mTag);
 				ft.add(R.id.fragment_content, mFragment, mFragment.getText());
 			} else
 			{
@@ -167,14 +170,13 @@ public class ActionBarTabs extends FragmentActivity
 		private WebView mWebView;
 		private String mTag;
 
+		// public TabContentFragment(String URL, String tag)
+		// {
+		// mURL = URL;
+		// mTag = tag;
+		//
+		// }
 
-//		public TabContentFragment(String URL, String tag)
-//		{
-//			mURL = URL;
-//			mTag = tag;
-//			
-//		}
-		
 		public static TabContentFragment newInstance(String URL, String tag)
 		{
 			TabContentFragment f = new TabContentFragment();
@@ -185,21 +187,21 @@ public class ActionBarTabs extends FragmentActivity
 
 			return f;
 		}
-		
+
 		@Override
 		public void onCreate(Bundle savedInstanceState)
 		{
 			super.onCreate(savedInstanceState);
-			mURL = getArguments() != null ? getArguments().getString("URL") : "http://m.591.com.tw/mobile-index.html?f=app";
-			mTag =  getArguments() != null ? getArguments().getString("TAG") : "591";
+			mURL = getArguments() != null ? getArguments().getString("URL")
+					: "http://m.591.com.tw/mobile-index.html?f=app";
+			mTag = getArguments() != null ? getArguments().getString("TAG")
+					: "591";
 		}
 
 		public String getText()
 		{
 			return mTag;
 		}
-		
-		
 
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -209,7 +211,6 @@ public class ActionBarTabs extends FragmentActivity
 			progress = (ProgressBar) v.findViewById(R.id.progressBar);
 			mWebView = (WebView) v.findViewById(R.id.fragment_webview);
 			mWebView.loadUrl(mURL);
-			
 
 			WebSettings webSettings = mWebView.getSettings();
 			webSettings.setJavaScriptEnabled(true);
@@ -263,10 +264,11 @@ public class ActionBarTabs extends FragmentActivity
 		}
 
 	}
-	
+
 	private void CallAds()
 	{
-		boolean isGivenStar = Setting.getBooleanSetting(Setting.KeyGiveStar, ActionBarTabs.this);
+		boolean isGivenStar = Setting.getBooleanSetting(Setting.KeyGiveStar,
+				ActionBarTabs.this);
 
 		if (!isGivenStar)
 		{
@@ -303,7 +305,7 @@ public class ActionBarTabs extends FragmentActivity
 			});
 		}
 	}
-	
+
 	@Override
 	public void onStart()
 	{

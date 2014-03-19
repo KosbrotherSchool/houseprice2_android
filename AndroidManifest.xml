@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.kosbrother.houseprice"
-    android:versionCode="11"
-    android:versionName="2.0.2" >
+    android:versionCode="13"
+    android:versionName="2.0.4" >
 
     <uses-sdk
         android:minSdkVersion="11"
@@ -43,7 +43,9 @@
         <activity
             android:name="com.kosbrother.houseprice.MainActivity"
             android:configChanges="keyboardHidden|orientation"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustPan"
+             >
         </activity>
         <activity
             android:name="com.kosbrother.houseprice.FilterActivity"
@@ -60,7 +62,8 @@
         <activity
             android:name="com.kosbrother.houseprice.ListActivity"
             android:configChanges="keyboardHidden|orientation"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait"
+             >
         </activity>
         <activity
             android:name="com.kosbrother.houseprice.AboutUsActivity"

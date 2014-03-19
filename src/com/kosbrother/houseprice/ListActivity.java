@@ -7,6 +7,7 @@ import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -53,29 +54,30 @@ public class ListActivity extends FragmentActivity
 	private Button distanceButton;
 	private ImageButton previousImageButton;
 	private ImageButton nextImageButton;
-	
+
 	private LinearLayout yearMonthLinearLayout;
 	private LinearLayout titleLinearLayout;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.actiity_list);
-		
+
 		if (Datas.mEstatesMap == null)
 		{
-			Toast.makeText(ListActivity.this, "無資料!", Toast.LENGTH_SHORT).show();
+			Toast.makeText(ListActivity.this, "無資料!", Toast.LENGTH_SHORT)
+					.show();
 			finish();
 		}
-		
+
 		yearMonthLinearLayout = (LinearLayout) findViewById(R.id.year_month_linear_layout);
 		titleLinearLayout = (LinearLayout) findViewById(R.id.title_linear_layout);
 		yearMonthLinearLayout.setVisibility(View.VISIBLE);
 		titleLinearLayout.setVisibility(View.INVISIBLE);
 		previousImageButton = (ImageButton) findViewById(R.id.button_previous);
 		nextImageButton = (ImageButton) findViewById(R.id.button_next);
-		
+
 		mPager = (ViewPager) findViewById(R.id.pager);
 		yearMonthTextView = (TextView) findViewById(R.id.text_year_month);
 		NUM_ITEMS = Datas.mArrayKey.size();
@@ -84,8 +86,7 @@ public class ListActivity extends FragmentActivity
 		mPager.setCurrentItem(NUM_ITEMS - 1);
 		yearMonthTextView.setText(makeYearMonthString(Datas
 				.getKeyByPosition(NUM_ITEMS - 1)));
-		
-		
+
 		previousImageButton.setOnClickListener(new OnClickListener()
 		{
 			@Override
@@ -93,9 +94,11 @@ public class ListActivity extends FragmentActivity
 			{
 				if (mPager.getCurrentItem() == 0)
 				{
-					Toast.makeText(ListActivity.this, "無上月資料,請設定搜索時間", Toast.LENGTH_SHORT).show();
-				}else {
-					mPager.setCurrentItem(mPager.getCurrentItem()-1);
+					Toast.makeText(ListActivity.this, "無上月資料,請設定搜索時間",
+							Toast.LENGTH_SHORT).show();
+				} else
+				{
+					mPager.setCurrentItem(mPager.getCurrentItem() - 1);
 				}
 
 			}
@@ -107,17 +110,18 @@ public class ListActivity extends FragmentActivity
 			@Override
 			public void onClick(View v)
 			{
-				if (mPager.getCurrentItem() == mAdapter.getCount() -1)
+				if (mPager.getCurrentItem() == mAdapter.getCount() - 1)
 				{
-					Toast.makeText(ListActivity.this, "無下月資料", Toast.LENGTH_SHORT).show();
-				}else {
-					mPager.setCurrentItem(mPager.getCurrentItem()+1);
+					Toast.makeText(ListActivity.this, "無下月資料",
+							Toast.LENGTH_SHORT).show();
+				} else
+				{
+					mPager.setCurrentItem(mPager.getCurrentItem() + 1);
 				}
 
 			}
 		});
-		
-		
+
 		distanceButton = (Button) findViewById(R.id.distance_button);
 		distanceButton.setText(Double.toString(AppConstants.km_dis) + "km");
 		distanceButton.setOnClickListener(new OnClickListener()
@@ -266,9 +270,11 @@ public class ListActivity extends FragmentActivity
 		});
 
 		mActionBar = getActionBar();
-		mActionBar.setDisplayHomeAsUpEnabled(true);
-		mActionBar.setHomeButtonEnabled(true);
-
+		if (Build.VERSION.SDK_INT >= 14)
+		{
+			mActionBar.setDisplayHomeAsUpEnabled(true);
+			mActionBar.setHomeButtonEnabled(true);
+		}
 		mPager.setOnPageChangeListener(new OnPageChangeListener()
 		{
 
@@ -294,17 +300,16 @@ public class ListActivity extends FragmentActivity
 			}
 		});
 
-		 CallAds();
+		CallAds();
 	}
 
-	
 	@Override
 	protected void onResume()
 	{
 		// TODO Auto-generated method stub
 		super.onResume();
 	}
-	
+
 	private void setDateButtonText()
 	{
 		int startYear = AppConstants.startDate / 100;
@@ -355,7 +360,7 @@ public class ListActivity extends FragmentActivity
 			super.onPreExecute();
 			yearMonthLinearLayout.setVisibility(View.INVISIBLE);
 			titleLinearLayout.setVisibility(View.VISIBLE);
-			
+
 		}
 
 		@Override
@@ -419,13 +424,12 @@ public class ListActivity extends FragmentActivity
 		@Override
 		protected void onPostExecute(Void result)
 		{
-			
+
 			MainActivity.isResetView = true;
-			
+
 			if (Datas.mEstates != null && Datas.mEstates.size() != 0)
 			{
-				
-				
+
 				Datas.mEstatesMap = getRealEstatesMap(Datas.mEstates);
 
 				// set new pager adapter
@@ -446,12 +450,12 @@ public class ListActivity extends FragmentActivity
 				mPager.setCurrentItem(NUM_ITEMS - 1);
 				yearMonthTextView.setText(makeYearMonthString(Datas
 						.getKeyByPosition(NUM_ITEMS - 1)));
-				
+
 				Toast.makeText(ListActivity.this, "無資料~", Toast.LENGTH_SHORT)
 						.show();
 				// titleTextView.setText("無資料~");
 			}
-			
+
 			yearMonthLinearLayout.setVisibility(View.VISIBLE);
 			titleLinearLayout.setVisibility(View.INVISIBLE);
 
@@ -579,7 +583,6 @@ public class ListActivity extends FragmentActivity
 		return super.onCreateOptionsMenu(menu);
 	}
 
-
 	private void showSelectDistanceDialog()
 	{
 
@@ -706,7 +709,7 @@ public class ListActivity extends FragmentActivity
 			});
 		}
 	}
-	
+
 	@Override
 	public void onStart()
 	{
