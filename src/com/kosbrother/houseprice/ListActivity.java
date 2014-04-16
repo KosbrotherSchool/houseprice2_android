@@ -6,6 +6,7 @@ import java.util.TreeMap;
 import android.app.ActionBar;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -31,6 +32,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.MapBuilder;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
@@ -568,7 +570,17 @@ public class ListActivity extends FragmentActivity
 		case android.R.id.home:
 			finish();
 			MainActivity.isReSearch = false;
-			return true;
+			break;
+		case R.id.action_watch_price_chage:
+			EasyTracker easyTracker = EasyTracker
+					.getInstance(ListActivity.this);
+			easyTracker.send(MapBuilder.createEvent("Button", "button_press",
+					"price_change_activity", null).build());
+
+			Intent intent = new Intent();
+			intent.setClass(ListActivity.this, MonthPriceChangeActivity.class);
+			startActivity(intent);
+			break;
 		default:
 			break;
 		}
@@ -579,7 +591,7 @@ public class ListActivity extends FragmentActivity
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		super.onCreateOptionsMenu(menu);
-		// getSupportMenuInflater().inflate(R.menu.detail, menu);
+		getMenuInflater().inflate(R.menu.list, menu);
 		return super.onCreateOptionsMenu(menu);
 	}
 

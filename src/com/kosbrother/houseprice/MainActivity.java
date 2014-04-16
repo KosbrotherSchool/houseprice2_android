@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
+import android.R.integer;
 import android.app.ActivityManager;
 import android.app.ActivityManager.MemoryInfo;
 import android.app.AlertDialog;
@@ -83,7 +84,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.kosbrother.houseprice.api.HouseApi;
+import com.kosbrother.houseprice.entity.County;
 import com.kosbrother.houseprice.entity.RealEstate;
+import com.kosbrother.houseprice.entity.Town;
 import com.kosbrother.houseprice.fragment.TransparentSupportMapFragment;
 
 public class MainActivity extends FragmentActivity implements
@@ -143,13 +146,14 @@ public class MainActivity extends FragmentActivity implements
 	public static boolean isBackFromFilter = false;
 
 	// private DatabaseHelper databaseHelper = null;
-
+	private ArrayList<Town> towns = new ArrayList<Town>();
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.drawer_layout);
-
+		
 		boolean isFirstOpen = Setting.getBooleanSetting(Setting.keyFirstOpenV2,
 				this);
 		if (isFirstOpen)
@@ -496,15 +500,45 @@ public class MainActivity extends FragmentActivity implements
 			@Override
 			public void onClick(View v)
 			{
-				EasyTracker easyTracker = EasyTracker
-						.getInstance(MainActivity.this);
-				easyTracker.send(MapBuilder.createEvent("Button",
-						"button_press", "price_change_activity", null).build());
+				showCountyDialog();
+			}
 
-				Intent intent = new Intent();
-				intent.setClass(MainActivity.this,
-						MonthPriceChangeActivity.class);
-				startActivity(intent);
+			private void showCountyDialog()
+			{
+				final ArrayList<County> mCounties = HouseApi.getCounties();
+				final String[] ListStr = new String[mCounties.size()];
+            	for (int i=0;i< mCounties.size();i++){
+            		ListStr[i] = mCounties.get(i).name;
+            	}
+				AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("選擇地區");
+                builder.setItems(ListStr, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int position) {                   
+                         showTownDialog(mCounties.get(position).id);
+                    }				
+                });
+                AlertDialog alert = builder.create();
+                alert.show();		
+			}
+			
+			private void showTownDialog(int county_id)
+			{
+				final ArrayList<Town> mTowns = HouseApi.getCountyTowns(county_id);
+				final String[] ListStr = new String[mTowns.size()];
+            	for (int i=0;i< mTowns.size();i++){
+            		ListStr[i] = mTowns.get(i).name;
+            	}
+            	AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("選擇鄉鎮");
+                builder.setItems(ListStr, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int position) {                   
+                    	AppConstants.currentLatLng = new LatLng(
+                    			mTowns.get(position).y_lat, mTowns.get(position).x_long);
+                    	getLocation(false, 1);
+                    }				
+                });
+                AlertDialog alert = builder.create();
+                alert.show();	
 			}
 		});
 

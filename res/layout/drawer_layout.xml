@@ -213,11 +213,11 @@
                     android:gravity="center"
                     android:orientation="horizontal" >
 
-                    <ImageView
+                   <ImageView
                         android:layout_width="32dp"
                         android:layout_height="32dp"
                         android:clickable="false"
-                        android:src="@drawable/icon_stock" />
+                        android:src="@drawable/area_location" />
 
                     <TextView
                         android:id="@+id/house_price_changing_text"
@@ -228,7 +228,7 @@
                         android:gravity="center"
                         android:paddingBottom="5dp"
                         android:paddingTop="5dp"
-                        android:text="看漲跌" />
+                        android:text="區域搜索" />
                 </LinearLayout>
 
                 <LinearLayout

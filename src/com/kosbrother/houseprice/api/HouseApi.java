@@ -16,16 +16,26 @@ import android.util.Log;
 
 import com.kosbrother.houseprice.Datas;
 import com.kosbrother.houseprice.entity.BuildingData;
+import com.kosbrother.houseprice.entity.County;
 import com.kosbrother.houseprice.entity.LandData;
 import com.kosbrother.houseprice.entity.ParkingData;
 import com.kosbrother.houseprice.entity.RealEstate;
+import com.kosbrother.houseprice.entity.Town;
 
 public class HouseApi
 {
 	final static String HOST = "http://1.34.193.26";
 	public static final String TAG = "HOUSE_API";
 	public static final boolean DEBUG = true;
-
+	
+	public static ArrayList<County> getCounties(){
+		return County.getCounties();
+	}
+	
+	public static ArrayList<Town> getCountyTowns(int county_id){
+		return Town.getTonwsByCounty(county_id);
+	}
+	
 	public static ArrayList<RealEstate> getAroundAllByAreas(
 			double km_dis, double center_x,
 			double center_y, int start_date, int end_date, String hp_min,
