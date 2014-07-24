@@ -9,6 +9,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -24,22 +28,39 @@ import com.kosbrother.houseprice.entity.Town;
 
 public class HouseApi
 {
-	final static String HOST = "http://1.34.193.26";
+	final static String HOST = "http://106.186.24.99";
 	public static final String TAG = "HOUSE_API";
 	public static final boolean DEBUG = true;
-	
-	public static ArrayList<County> getCounties(){
+
+	public static ArrayList<County> getCounties()
+	{
 		return County.getCounties();
 	}
-	
-	public static ArrayList<Town> getCountyTowns(int county_id){
+
+	public static ArrayList<Town> getCountyTowns(int county_id)
+	{
 		return Town.getTonwsByCounty(county_id);
 	}
-	
-	public static ArrayList<RealEstate> getAroundAllByAreas(
-			double km_dis, double center_x,
-			double center_y, int start_date, int end_date, String hp_min,
-			String hp_max, String area_min, String area_max,
+
+	public static boolean postLender(String name, String sexual,
+			String location, String phone, String phone_time)
+	{
+		String urlString = HOST+"/api/v2/estate/post_lender?name=" + name
+				+ "&sexual=" + sexual + "&location=" + location + "&phone="
+				+ phone + "&phone_time=" + phone_time;
+		String message = httpPOST(urlString);
+		if (message!=null)
+		{
+			return true;
+		}else {
+			return false;
+		}
+
+	}
+
+	public static ArrayList<RealEstate> getAroundAllByAreas(double km_dis,
+			double center_x, double center_y, int start_date, int end_date,
+			String hp_min, String hp_max, String area_min, String area_max,
 			String groundTypeString, String buildingTypeString)
 	{
 
@@ -531,6 +552,30 @@ public class HouseApi
 			e.printStackTrace();
 			return null;
 		}
+	}
+
+	private static String httpPOST(String url)
+	{
+		HttpPost post = new HttpPost(url);
+		try
+		{
+			// 送出HTTP request
+			// post.setEntity(new UrlEncodedFormEntity(null, HTTP.UTF_8));
+			// 取得HTTP response
+			HttpResponse httpResponse = new DefaultHttpClient().execute(post);
+			// 檢查狀態碼，200表示OK
+			if (httpResponse.getStatusLine().getStatusCode() == 200)
+			{
+				// 取出回應字串
+				String strResult = EntityUtils.toString(httpResponse
+						.getEntity());
+				return strResult;
+			}
+		} catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 }

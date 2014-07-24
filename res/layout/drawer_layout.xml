@@ -103,7 +103,7 @@
                     android:id="@+id/map"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    class="com.kosbrother.houseprice.fragment.TransparentSupportMapFragment" />
+                    class="com.google.android.gms.maps.MapFragment" />
 
                 <LinearLayout
                     android:id="@+id/searchTextLayout"
@@ -192,6 +192,17 @@
                         android:padding="8dp"
                         android:scaleType="fitXY"
                         android:src="@drawable/icon_filter_white" />
+                    
+                    <ImageButton
+                        android:id="@+id/image_btn_loan"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/grid_selector"
+                        android:padding="8dp"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/icon_money" />
+                    
                 </LinearLayout>
             </RelativeLayout>
 

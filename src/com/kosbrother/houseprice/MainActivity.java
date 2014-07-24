@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
-import android.R.integer;
 import android.app.ActivityManager;
 import android.app.ActivityManager.MemoryInfo;
 import android.app.AlertDialog;
@@ -69,6 +68,7 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -77,21 +77,19 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
-import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.kosbrother.houseprice.api.HouseApi;
 import com.kosbrother.houseprice.entity.County;
 import com.kosbrother.houseprice.entity.RealEstate;
 import com.kosbrother.houseprice.entity.Town;
-import com.kosbrother.houseprice.fragment.TransparentSupportMapFragment;
 
-public class MainActivity extends FragmentActivity implements
-		LocationListener, GooglePlayServicesClient.ConnectionCallbacks,
-		GooglePlayServicesClient.OnConnectionFailedListener, OnMapClickListener
+public class MainActivity extends FragmentActivity implements LocationListener,
+		GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener,
+		OnMapClickListener
 {
 
 	private LocationClient mLocationClient;
@@ -108,6 +106,7 @@ public class MainActivity extends FragmentActivity implements
 	private ImageButton btnFocusButton;
 	private ImageButton btnLayerButton;
 	private ImageButton btnFilterButton;
+	private ImageButton btnLoanButton;
 	private int currentMapTypePosition = 0;
 	private LinearLayout leftDrawer;
 	private ImageButton previousImageButton;
@@ -148,14 +147,15 @@ public class MainActivity extends FragmentActivity implements
 	// private DatabaseHelper databaseHelper = null;
 	private ArrayList<Town> towns = new ArrayList<Town>();
 	
+	private InterstitialAd interstitial;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.drawer_layout);
-		
-		boolean isFirstOpen = Setting.getBooleanSetting(Setting.keyFirstOpenV2,
-				this);
+
+		boolean isFirstOpen = Setting.getBooleanSetting(Setting.keyFirstOpenV2, this);
 		if (isFirstOpen)
 		{
 			final LinearLayout firstLinearLayout = (LinearLayout) findViewById(R.id.first_teach_layout);
@@ -167,15 +167,13 @@ public class MainActivity extends FragmentActivity implements
 				@Override
 				public void onClick(View v)
 				{
-					Setting.saveBooleanSetting(Setting.keyFirstOpenV2, false,
-							MainActivity.this);
+					Setting.saveBooleanSetting(Setting.keyFirstOpenV2, false, MainActivity.this);
 					firstLinearLayout.setVisibility(View.GONE);
 				}
 			});
 		}
 
-		AppConstants.km_dis = Double.valueOf(Setting.getSetting(
-				Setting.keyKmDistance, this));
+		AppConstants.km_dis = Double.valueOf(Setting.getSetting(Setting.keyKmDistance, this));
 		crawlDateNum = Setting.getCurrentDateNum(this);
 		priceChangeLayout = (LinearLayout) findViewById(R.id.linear_price_change);
 		dataListLayout = (LinearLayout) findViewById(R.id.linear_data_list);
@@ -196,10 +194,8 @@ public class MainActivity extends FragmentActivity implements
 			@Override
 			public void onClick(View v)
 			{
-				EasyTracker easyTracker = EasyTracker
-						.getInstance(MainActivity.this);
-				easyTracker.send(MapBuilder.createEvent("Button",
-						"button_press", "focus_button", null).build());
+				EasyTracker easyTracker = EasyTracker.getInstance(MainActivity.this);
+				easyTracker.send(MapBuilder.createEvent("Button", "button_press", "focus_button", null).build());
 				getLocation(true, 1);
 			}
 		});
@@ -212,10 +208,8 @@ public class MainActivity extends FragmentActivity implements
 			@Override
 			public void onClick(View v)
 			{
-				EasyTracker easyTracker = EasyTracker
-						.getInstance(MainActivity.this);
-				easyTracker.send(MapBuilder.createEvent("Button",
-						"button_press", "dis_button", null).build());
+				EasyTracker easyTracker = EasyTracker.getInstance(MainActivity.this);
+				easyTracker.send(MapBuilder.createEvent("Button", "button_press", "dis_button", null).build());
 				showSelectDistanceDialog();
 			}
 		});
@@ -226,21 +220,16 @@ public class MainActivity extends FragmentActivity implements
 			public void onClick(View v)
 			{
 
-				EasyTracker easyTracker = EasyTracker
-						.getInstance(MainActivity.this);
-				easyTracker.send(MapBuilder.createEvent("Button",
-						"button_press", "layer_button", null).build());
+				EasyTracker easyTracker = EasyTracker.getInstance(MainActivity.this);
+				easyTracker.send(MapBuilder.createEvent("Button", "button_press", "layer_button", null).build());
 
-				AlertDialog.Builder builder = new AlertDialog.Builder(
-						MainActivity.this);
+				AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
 				// Set the dialog title
-				builder.setTitle("顯示地圖").setSingleChoiceItems(R.array.map_type,
-						currentMapTypePosition,
+				builder.setTitle("顯示地圖").setSingleChoiceItems(R.array.map_type, currentMapTypePosition,
 						new DialogInterface.OnClickListener()
 						{
 							@Override
-							public void onClick(DialogInterface dialog,
-									int position)
+							public void onClick(DialogInterface dialog, int position)
 							{
 								setMapTypeByPosition(position);
 								currentMapTypePosition = position;
@@ -252,16 +241,13 @@ public class MainActivity extends FragmentActivity implements
 								switch (position)
 								{
 								case 0:
-									mGoogleMap
-											.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+									mGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
 									break;
 								case 1:
-									mGoogleMap
-											.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+									mGoogleMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
 									break;
 								case 2:
-									mGoogleMap
-											.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+									mGoogleMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
 									break;
 								default:
 									break;
@@ -280,15 +266,12 @@ public class MainActivity extends FragmentActivity implements
 			public void onClick(View v)
 			{
 
-				EasyTracker easyTracker = EasyTracker
-						.getInstance(MainActivity.this);
-				easyTracker.send(MapBuilder.createEvent("Button",
-						"button_press", "previous_button", null).build());
+				EasyTracker easyTracker = EasyTracker.getInstance(MainActivity.this);
+				easyTracker.send(MapBuilder.createEvent("Button", "button_press", "previous_button", null).build());
 
 				if (mPage == 0)
 				{
-					Toast.makeText(MainActivity.this, "上頁無資料",
-							Toast.LENGTH_SHORT).show();
+					Toast.makeText(MainActivity.this, "上頁無資料", Toast.LENGTH_SHORT).show();
 				} else
 				{
 					mPage = mPage - 1;
@@ -312,15 +295,12 @@ public class MainActivity extends FragmentActivity implements
 			@Override
 			public void onClick(View v)
 			{
-				EasyTracker easyTracker = EasyTracker
-						.getInstance(MainActivity.this);
-				easyTracker.send(MapBuilder.createEvent("Button",
-						"button_press", "next_button", null).build());
+				EasyTracker easyTracker = EasyTracker.getInstance(MainActivity.this);
+				easyTracker.send(MapBuilder.createEvent("Button", "button_press", "next_button", null).build());
 
 				if ((mPage + 1) * 100 > Datas.mEstates.size())
 				{
-					Toast.makeText(MainActivity.this, "下頁無資料",
-							Toast.LENGTH_SHORT).show();
+					Toast.makeText(MainActivity.this, "下頁無資料", Toast.LENGTH_SHORT).show();
 				} else
 				{
 					mPage = mPage + 1;
@@ -344,28 +324,21 @@ public class MainActivity extends FragmentActivity implements
 			@Override
 			public void onClick(View arg0)
 			{
-				EasyTracker easyTracker = EasyTracker
-						.getInstance(MainActivity.this);
-				easyTracker.send(MapBuilder.createEvent("Button",
-						"button_press", "date_button", null).build());
+				EasyTracker easyTracker = EasyTracker.getInstance(MainActivity.this);
+				easyTracker.send(MapBuilder.createEvent("Button", "button_press", "date_button", null).build());
 				showDateDialog();
 			}
 
 			private void showDateDialog()
 			{
-				AlertDialog.Builder dialog = new AlertDialog.Builder(
-						MainActivity.this);
+				AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
 
 				LayoutInflater inflater = MainActivity.this.getLayoutInflater();
 				View layout = inflater.inflate(R.layout.dialog_set_date, null);
-				final EditText startYearEditText = (EditText) layout
-						.findViewById(R.id.start_year_edittext);
-				final EditText startMonthEditText = (EditText) layout
-						.findViewById(R.id.start_month_edittext);
-				final EditText endYearEditText = (EditText) layout
-						.findViewById(R.id.end_year_edittext);
-				final EditText endMonthEditText = (EditText) layout
-						.findViewById(R.id.end_month_edittext);
+				final EditText startYearEditText = (EditText) layout.findViewById(R.id.start_year_edittext);
+				final EditText startMonthEditText = (EditText) layout.findViewById(R.id.start_month_edittext);
+				final EditText endYearEditText = (EditText) layout.findViewById(R.id.end_year_edittext);
+				final EditText endMonthEditText = (EditText) layout.findViewById(R.id.end_month_edittext);
 
 				int startYear = AppConstants.startDate / 100;
 				int startMonth = AppConstants.startDate % 100;
@@ -381,115 +354,87 @@ public class MainActivity extends FragmentActivity implements
 
 				dialog.setTitle("選擇搜索日期");
 				dialog.setView(layout);
-				dialog.setNegativeButton("取消",
-						new DialogInterface.OnClickListener()
+				dialog.setNegativeButton("取消", new DialogInterface.OnClickListener()
+				{
+					public void onClick(DialogInterface dialoginterface, int i)
+					{
+
+					}
+				});
+				dialog.setPositiveButton("確定", new DialogInterface.OnClickListener()
+				{
+					public void onClick(DialogInterface dialoginterface, int i)
+					{
+
+						int startYear = AppConstants.startDate / 100;
+						try
 						{
-							public void onClick(
-									DialogInterface dialoginterface, int i)
-							{
-
-							}
-						});
-				dialog.setPositiveButton("確定",
-						new DialogInterface.OnClickListener()
+							startYear = Integer.valueOf(startYearEditText.getText().toString());
+						} catch (Exception e)
 						{
-							public void onClick(
-									DialogInterface dialoginterface, int i)
-							{
+							// TODO: handle exception
+						}
 
-								int startYear = AppConstants.startDate / 100;
-								try
-								{
-									startYear = Integer
-											.valueOf(startYearEditText
-													.getText().toString());
-								} catch (Exception e)
-								{
-									// TODO: handle exception
-								}
+						int startMonth = AppConstants.startDate % 100;
+						try
+						{
+							startMonth = Integer.valueOf(startMonthEditText.getText().toString());
+						} catch (Exception e)
+						{
+							// TODO: handle exception
+						}
 
-								int startMonth = AppConstants.startDate % 100;
-								try
-								{
-									startMonth = Integer
-											.valueOf(startMonthEditText
-													.getText().toString());
-								} catch (Exception e)
-								{
-									// TODO: handle exception
-								}
+						int endYear = AppConstants.endDate / 100;
+						try
+						{
+							endYear = Integer.valueOf(endYearEditText.getText().toString());
+						} catch (Exception e)
+						{
+							// TODO: handle exception
+						}
 
-								int endYear = AppConstants.endDate / 100;
-								try
-								{
-									endYear = Integer.valueOf(endYearEditText
-											.getText().toString());
-								} catch (Exception e)
-								{
-									// TODO: handle exception
-								}
+						int endMonth = AppConstants.endDate % 100;
+						try
+						{
+							endMonth = Integer.valueOf(endMonthEditText.getText().toString());
+						} catch (Exception e)
+						{
+							// TODO: handle exception
+						}
 
-								int endMonth = AppConstants.endDate % 100;
-								try
-								{
-									endMonth = Integer.valueOf(endMonthEditText
-											.getText().toString());
-								} catch (Exception e)
-								{
-									// TODO: handle exception
-								}
+						int endDate = endYear * 100 + endMonth;
 
-								int endDate = endYear * 100 + endMonth;
+						if (startYear < 96)
+						{
+							Toast.makeText(MainActivity.this, "起始年不可低於96年", Toast.LENGTH_SHORT).show();
+						} else if (endDate > crawlDateNum)
+						{
 
-								if (startYear < 96)
-								{
-									Toast.makeText(MainActivity.this,
-											"起始年不可低於96年", Toast.LENGTH_SHORT)
-											.show();
-								} else if (endDate > crawlDateNum)
-								{
+							int crawlYear = crawlDateNum / 100;
+							int crawlMomth = crawlDateNum % 100;
 
-									int crawlYear = crawlDateNum / 100;
-									int crawlMomth = crawlDateNum % 100;
+							Toast.makeText(MainActivity.this,
+									"最新資料為" + Integer.toString(crawlYear) + "年" + Integer.toString(crawlMomth) + "月",
+									Toast.LENGTH_SHORT).show();
 
-									Toast.makeText(
-											MainActivity.this,
-											"最新資料為"
-													+ Integer
-															.toString(crawlYear)
-													+ "年"
-													+ Integer
-															.toString(crawlMomth)
-													+ "月", Toast.LENGTH_SHORT)
-											.show();
+						} else if ((startYear * 100 + startMonth) > (endYear * 100 + endMonth))
+						{
+							Toast.makeText(MainActivity.this, "起始期間不可高於結束期間", Toast.LENGTH_SHORT).show();
+						} else
+						{
+							AppConstants.startDate = startYear * 100 + startMonth;
+							AppConstants.endDate = endYear * 100 + endMonth;
+							// Toast.makeText(MainActivity.this,
+							// Integer.toString(startDate),
+							// Toast.LENGTH_SHORT).show();
+							dateButton.setText(Integer.toString(startYear) + "/" + Integer.toString(startMonth) + "~"
+									+ Integer.toString(endYear) + "/" + Integer.toString(endMonth));
+							maekKeyArray();
+							getLocation(false, 1);
+						}
 
-								} else if ((startYear * 100 + startMonth) > (endYear * 100 + endMonth))
-								{
-									Toast.makeText(MainActivity.this,
-											"起始期間不可高於結束期間", Toast.LENGTH_SHORT)
-											.show();
-								} else
-								{
-									AppConstants.startDate = startYear * 100
-											+ startMonth;
-									AppConstants.endDate = endYear * 100
-											+ endMonth;
-									// Toast.makeText(MainActivity.this,
-									// Integer.toString(startDate),
-									// Toast.LENGTH_SHORT).show();
-									dateButton.setText(Integer
-											.toString(startYear)
-											+ "/"
-											+ Integer.toString(startMonth)
-											+ "~"
-											+ Integer.toString(endYear)
-											+ "/" + Integer.toString(endMonth));
-									maekKeyArray();
-									getLocation(false, 1);
-								}
-
-							}
-						});
+					}
+				});
 				dialog.show();
 			}
 		});
@@ -500,6 +445,8 @@ public class MainActivity extends FragmentActivity implements
 			@Override
 			public void onClick(View v)
 			{
+				EasyTracker easyTracker = EasyTracker.getInstance(MainActivity.this);
+				easyTracker.send(MapBuilder.createEvent("Button", "button_press", "area_search_button", null).build());
 				showCountyDialog();
 			}
 
@@ -507,38 +454,43 @@ public class MainActivity extends FragmentActivity implements
 			{
 				final ArrayList<County> mCounties = HouseApi.getCounties();
 				final String[] ListStr = new String[mCounties.size()];
-            	for (int i=0;i< mCounties.size();i++){
-            		ListStr[i] = mCounties.get(i).name;
-            	}
+				for (int i = 0; i < mCounties.size(); i++)
+				{
+					ListStr[i] = mCounties.get(i).name;
+				}
 				AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setTitle("選擇地區");
-                builder.setItems(ListStr, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int position) {                   
-                         showTownDialog(mCounties.get(position).id);
-                    }				
-                });
-                AlertDialog alert = builder.create();
-                alert.show();		
+				builder.setTitle("選擇地區");
+				builder.setItems(ListStr, new DialogInterface.OnClickListener()
+				{
+					public void onClick(DialogInterface dialog, int position)
+					{
+						showTownDialog(mCounties.get(position).id);
+					}
+				});
+				AlertDialog alert = builder.create();
+				alert.show();
 			}
-			
+
 			private void showTownDialog(int county_id)
 			{
 				final ArrayList<Town> mTowns = HouseApi.getCountyTowns(county_id);
 				final String[] ListStr = new String[mTowns.size()];
-            	for (int i=0;i< mTowns.size();i++){
-            		ListStr[i] = mTowns.get(i).name;
-            	}
-            	AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setTitle("選擇鄉鎮");
-                builder.setItems(ListStr, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int position) {                   
-                    	AppConstants.currentLatLng = new LatLng(
-                    			mTowns.get(position).y_lat, mTowns.get(position).x_long);
-                    	getLocation(false, 1);
-                    }				
-                });
-                AlertDialog alert = builder.create();
-                alert.show();	
+				for (int i = 0; i < mTowns.size(); i++)
+				{
+					ListStr[i] = mTowns.get(i).name;
+				}
+				AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+				builder.setTitle("選擇鄉鎮");
+				builder.setItems(ListStr, new DialogInterface.OnClickListener()
+				{
+					public void onClick(DialogInterface dialog, int position)
+					{
+						AppConstants.currentLatLng = new LatLng(mTowns.get(position).y_lat, mTowns.get(position).x_long);
+						getLocation(false, 1);
+					}
+				});
+				AlertDialog alert = builder.create();
+				alert.show();
 			}
 		});
 
@@ -548,10 +500,8 @@ public class MainActivity extends FragmentActivity implements
 			@Override
 			public void onClick(View v)
 			{
-				EasyTracker easyTracker = EasyTracker
-						.getInstance(MainActivity.this);
-				easyTracker.send(MapBuilder.createEvent("Button",
-						"button_press", "data_list_activity", null).build());
+				EasyTracker easyTracker = EasyTracker.getInstance(MainActivity.this);
+				easyTracker.send(MapBuilder.createEvent("Button", "button_press", "data_list_activity", null).build());
 
 				Intent intent = new Intent();
 				intent.setClass(MainActivity.this, ListActivity.class);
@@ -565,10 +515,8 @@ public class MainActivity extends FragmentActivity implements
 			@Override
 			public void onClick(View arg0)
 			{
-				EasyTracker easyTracker = EasyTracker
-						.getInstance(MainActivity.this);
-				easyTracker.send(MapBuilder.createEvent("Button",
-						"button_press", "find_house_activity", null).build());
+				EasyTracker easyTracker = EasyTracker.getInstance(MainActivity.this);
+				easyTracker.send(MapBuilder.createEvent("Button", "button_press", "find_house_activity", null).build());
 
 				Intent intent = new Intent();
 				intent.setClass(MainActivity.this, ActionBarTabs.class);
@@ -588,23 +536,22 @@ public class MainActivity extends FragmentActivity implements
 		btnFocusButton = (ImageButton) findViewById(R.id.image_btn_focus);
 		btnLayerButton = (ImageButton) findViewById(R.id.image_btn_layers);
 		btnFilterButton = (ImageButton) findViewById(R.id.image_btn_filter);
+		btnLoanButton = (ImageButton) findViewById(R.id.image_btn_loan);
 		leftDrawer = (LinearLayout) findViewById(R.id.left_drawer);
 
 		// mDrawerLayout.setDrawerListener(new DemoDrawerListener());
-		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow,
-				GravityCompat.START);
+		mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 
 		// enable ActionBar app icon to behave as action to toggle nav drawer
 		if (Build.VERSION.SDK_INT >= 14)
 		{
-//			Toast.makeText(this, Integer.toString(Build.VERSION.SDK_INT), Toast.LENGTH_SHORT).show();
+			// Toast.makeText(this, Integer.toString(Build.VERSION.SDK_INT),
+			// Toast.LENGTH_SHORT).show();
 			getActionBar().setDisplayHomeAsUpEnabled(true);
 			getActionBar().setHomeButtonEnabled(true);
 		}
-		
 
-		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-				R.drawable.ic_drawer, R.string.drawer_open,
+		mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.drawable.ic_drawer, R.string.drawer_open,
 				R.string.drawer_close)
 		{
 			public void onDrawerClosed(View view)
@@ -631,14 +578,32 @@ public class MainActivity extends FragmentActivity implements
 			@Override
 			public void onClick(View v)
 			{
-				EasyTracker easyTracker = EasyTracker
-						.getInstance(MainActivity.this);
-				easyTracker.send(MapBuilder.createEvent("Button",
-						"button_press", "filter_button", null).build());
+				EasyTracker easyTracker = EasyTracker.getInstance(MainActivity.this);
+				easyTracker.send(MapBuilder.createEvent("Button", "button_press", "filter_button", null).build());
 
 				Intent intent = new Intent();
 				intent.setClass(MainActivity.this, FilterActivity.class);
 				startActivity(intent);
+			}
+		});
+
+		btnLoanButton.setOnClickListener(new OnClickListener()
+		{
+
+			@Override
+			public void onClick(View v)
+			{
+				EasyTracker easyTracker = EasyTracker.getInstance(MainActivity.this);
+				easyTracker.send(MapBuilder.createEvent("Button", "button_press", "loan_map_button", null).build());
+				
+				Uri uri=Uri.parse("http://www.e-loan.com.tw");
+                Intent i=new Intent(Intent.ACTION_VIEW,uri);
+                startActivity(i);
+				
+//				Intent intent = new Intent();
+//				intent.setClass(MainActivity.this, LoanAdviseActivity.class);
+//				startActivity(intent);
+
 			}
 		});
 
@@ -654,7 +619,7 @@ public class MainActivity extends FragmentActivity implements
 			e.printStackTrace();
 		}
 
-		CallAds();
+		 CallAds();
 
 	}
 
@@ -671,23 +636,22 @@ public class MainActivity extends FragmentActivity implements
 			startMonth = month - 3;
 			startYear = year;
 
+		} else if (month == 3)
+		{
+			startMonth = 12;
+			startYear = year - 1;
 		} else
 		{
-			for (int i = 0; i < 3; i++)
-			{
-				startMonth = (month + 12 - 3) % 12;
-				startYear = year - 1;
-			}
+			startMonth = (month + 12 - 3) % 12;
+			startYear = year - 1;
 		}
 
 		AppConstants.startDate = startYear * 100 + startMonth;
 		AppConstants.endDate = crawlDateNum;
 
-		String dateStartString = Integer.toString(startYear) + "/"
-				+ Integer.toString(startMonth);
+		String dateStartString = Integer.toString(startYear) + "/" + Integer.toString(startMonth);
 
-		String dateEndString = Integer.toString(year) + "/"
-				+ Integer.toString(month);
+		String dateEndString = Integer.toString(year) + "/" + Integer.toString(month);
 
 		dateButton.setText(dateStartString + "~" + dateEndString);
 
@@ -724,8 +688,8 @@ public class MainActivity extends FragmentActivity implements
 	{
 		if (mGoogleMap == null)
 		{
-			mGoogleMap = ((TransparentSupportMapFragment) getSupportFragmentManager()
-					.findFragmentById(R.id.map)).getMap();
+			mGoogleMap =((MapFragment) getFragmentManager().findFragmentById(
+                    R.id.map)).getMap();
 
 			// mLocationManager = (LocationManager)
 			// getSystemService(LOCATION_SERVICE);
@@ -738,9 +702,7 @@ public class MainActivity extends FragmentActivity implements
 
 			if (mGoogleMap == null)
 			{
-				Toast.makeText(getApplicationContext(),
-						"Sorry! unable to create maps", Toast.LENGTH_SHORT)
-						.show();
+				Toast.makeText(getApplicationContext(), "Sorry! unable to create maps", Toast.LENGTH_SHORT).show();
 			}
 		}
 	}
@@ -748,97 +710,75 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
-		itemSearch = menu
-				.add(0, ID_SEARCH, 0, "搜索")
-				.setIcon(R.drawable.icon_search_white)
-				.setOnActionExpandListener(
-						new MenuItem.OnActionExpandListener()
+		itemSearch = menu.add(0, ID_SEARCH, 0, "搜索").setIcon(R.drawable.icon_search_white)
+				.setOnActionExpandListener(new MenuItem.OnActionExpandListener()
+				{
+					private EditText search;
+
+					@Override
+					public boolean onMenuItemActionExpand(MenuItem item)
+					{
+						search = (EditText) item.getActionView();
+						search.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
+						search.setInputType(InputType.TYPE_CLASS_TEXT);
+						search.requestFocus();
+						search.setOnEditorActionListener(new TextView.OnEditorActionListener()
 						{
-							private EditText search;
-
 							@Override
-							public boolean onMenuItemActionExpand(MenuItem item)
+							public boolean onEditorAction(TextView v, int actionId, KeyEvent event)
 							{
-								search = (EditText) item.getActionView();
-								search.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
-								search.setInputType(InputType.TYPE_CLASS_TEXT);
-								search.requestFocus();
-								search.setOnEditorActionListener(new TextView.OnEditorActionListener()
+								if (actionId == EditorInfo.IME_ACTION_SEARCH
+										|| event.getKeyCode() == KeyEvent.KEYCODE_ENTER)
 								{
-									@Override
-									public boolean onEditorAction(TextView v,
-											int actionId, KeyEvent event)
+
+									EasyTracker easyTracker = EasyTracker.getInstance(MainActivity.this);
+									easyTracker.send(MapBuilder.createEvent("Button", "button_press", "search_button",
+											null).build());
+
+									String inputString = v.getText().toString();
+									Geocoder geocoder = new Geocoder(MainActivity.this);
+									List<Address> addresses = null;
+									Address address = null;
+									InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+									imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+									try
 									{
-										if (actionId == EditorInfo.IME_ACTION_SEARCH
-												|| event.getKeyCode() == KeyEvent.KEYCODE_ENTER)
-										{
-											
-											EasyTracker easyTracker = EasyTracker
-													.getInstance(MainActivity.this);
-											easyTracker.send(MapBuilder.createEvent("Button",
-													"button_press", "search_button", null).build());
-											
-											String inputString = v.getText()
-													.toString();
-											Geocoder geocoder = new Geocoder(
-													MainActivity.this);
-											List<Address> addresses = null;
-											Address address = null;
-											InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-											imm.hideSoftInputFromWindow(
-													v.getWindowToken(), 0);
-											try
-											{
-												addresses = geocoder
-														.getFromLocationName(
-																inputString, 1);
-											} catch (Exception e)
-											{
-												Log.e("MainActivity",
-														e.toString());
-											}
-											if (addresses == null
-													|| addresses.isEmpty())
-											{
-												Toast.makeText(
-														MainActivity.this,
-														"無此地點",
-														Toast.LENGTH_SHORT)
-														.show();
-											} else
-											{
-												address = addresses.get(0);
-												double geoLat = address
-														.getLatitude();
-												double geoLong = address
-														.getLongitude();
-												AppConstants.currentLatLng = new LatLng(
-														geoLat, geoLong);
-												getLocation(false, 1);
-											}
-											return true;
-										}
-										return false;
+										addresses = geocoder.getFromLocationName(inputString, 1);
+									} catch (Exception e)
+									{
+										Log.e("MainActivity", e.toString());
 									}
-								});
-								InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-								imm.showSoftInput(search,
-										InputMethodManager.SHOW_IMPLICIT);
-								return true;
+									if (addresses == null || addresses.isEmpty())
+									{
+										Toast.makeText(MainActivity.this, "無此地點", Toast.LENGTH_SHORT).show();
+									} else
+									{
+										address = addresses.get(0);
+										double geoLat = address.getLatitude();
+										double geoLong = address.getLongitude();
+										AppConstants.currentLatLng = new LatLng(geoLat, geoLong);
+										getLocation(false, 1);
+									}
+									return true;
+								}
+								return false;
 							}
+						});
+						InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+						imm.showSoftInput(search, InputMethodManager.SHOW_IMPLICIT);
+						return true;
+					}
 
-							@Override
-							public boolean onMenuItemActionCollapse(
-									MenuItem item)
-							{
+					@Override
+					public boolean onMenuItemActionCollapse(MenuItem item)
+					{
 
-								search.setText("");
-								return true;
-							}
-						}).setActionView(R.layout.collapsible_edittext);
+						search.setText("");
+						return true;
+					}
+				}).setActionView(R.layout.collapsible_edittext);
 
-		itemSearch.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS
-				| MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
+		itemSearch.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS | MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW);
 
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.main, menu);
@@ -862,10 +802,11 @@ public class MainActivity extends FragmentActivity implements
 			{
 				getLocation(false, 0);
 				isBackFromFilter = false;
-			}else {
-				getLocation(true, 0);			
+			} else
+			{
+				getLocation(true, 0);
 			}
-			
+
 			isReSearch = false;
 		}
 	}
@@ -908,8 +849,7 @@ public class MainActivity extends FragmentActivity implements
 		int endYear = AppConstants.endDate / 100;
 		int endMonth = AppConstants.endDate % 100;
 
-		dateButton.setText(Integer.toString(startYear) + "/"
-				+ Integer.toString(startMonth) + "~"
+		dateButton.setText(Integer.toString(startYear) + "/" + Integer.toString(startMonth) + "~"
 				+ Integer.toString(endYear) + "/" + Integer.toString(endMonth));
 
 	}
@@ -968,18 +908,15 @@ public class MainActivity extends FragmentActivity implements
 
 				try
 				{
-					Location currentLocation = mLocationClient
-							.getLastLocation();
+					Location currentLocation = mLocationClient.getLastLocation();
 					if (currentLocation != null)
 					{
-						AppConstants.currentLatLng = new LatLng(
-								currentLocation.getLatitude(),
+						AppConstants.currentLatLng = new LatLng(currentLocation.getLatitude(),
 								currentLocation.getLongitude());
 					} else
 					{
 
-						AppConstants.currentLatLng = new LatLng(25.0478,
-								121.5172);
+						AppConstants.currentLatLng = new LatLng(25.0478, 121.5172);
 
 					}
 					// add location marker
@@ -1001,12 +938,10 @@ public class MainActivity extends FragmentActivity implements
 				if (0 < AppConstants.km_dis && AppConstants.km_dis <= 0.3)
 				{
 					mapSize = 17.0f;
-				} else if (0.3 < AppConstants.km_dis
-						&& AppConstants.km_dis <= 0.5)
+				} else if (0.3 < AppConstants.km_dis && AppConstants.km_dis <= 0.5)
 				{
 					mapSize = 16.0f;
-				} else if (0.5 < AppConstants.km_dis
-						&& AppConstants.km_dis <= 1)
+				} else if (0.5 < AppConstants.km_dis && AppConstants.km_dis <= 1)
 				{
 					mapSize = 15.0f;
 				} else if (1 < AppConstants.km_dis && AppConstants.km_dis <= 2)
@@ -1019,70 +954,60 @@ public class MainActivity extends FragmentActivity implements
 
 				if (aniParam == 0)
 				{
-					mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-							new LatLng(AppConstants.currentLatLng.latitude,
-									AppConstants.currentLatLng.longitude),
-							mapSize));
+					mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(
+							AppConstants.currentLatLng.latitude, AppConstants.currentLatLng.longitude), mapSize));
 				} else
 				{
-					CameraPosition cameraPosition = new CameraPosition.Builder()
-							.target(AppConstants.currentLatLng).zoom(mapSize)
-							.build();
-					mGoogleMap.animateCamera(CameraUpdateFactory
-							.newCameraPosition(cameraPosition));
+					CameraPosition cameraPosition = new CameraPosition.Builder().target(AppConstants.currentLatLng)
+							.zoom(mapSize).build();
+					mGoogleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 				}
 			}
 
-			mGoogleMap.setOnMarkerClickListener(new OnMarkerClickListener()
-			{
-
-				@Override
-				public boolean onMarkerClick(Marker marker)
-				{
-					if (marker == null || marker.getTitle() == null)
-					{
-						Toast.makeText(MainActivity.this, "marker null",
-								Toast.LENGTH_SHORT).show();
-						return true;
-					}
-
-					Intent intent = new Intent();
-					// String monthKey = Datas.getKeyByPosition(mPager
-					// .getCurrentItem());
-					intent.putExtra("MonthKey", "");
-					try
-					{
-						Log.i("RowNumber", marker.getTitle().trim());
-						intent.putExtra("RowNumber",
-								Integer.valueOf(marker.getTitle().trim()));
-					} catch (Exception e)
-					{
-						Toast.makeText(MainActivity.this, "marker error",
-								Toast.LENGTH_SHORT).show();
-						intent.putExtra("RowNumber", 1);
-					}
-
-					intent.setClass(MainActivity.this, DetailActivity.class);
-					startActivity(intent);
-					return true;
-				}
-			});
+//			mGoogleMap.setOnMarkerClickListener(new OnMarkerClickListener()
+//			{
+//
+//				@Override
+//				public boolean onMarkerClick(Marker marker)
+//				{
+//					if (marker == null || marker.getTitle() == null)
+//					{
+//						Toast.makeText(MainActivity.this, "marker null", Toast.LENGTH_SHORT).show();
+//						return true;
+//					}
+//
+//					Intent intent = new Intent();
+//					// String monthKey = Datas.getKeyByPosition(mPager
+//					// .getCurrentItem());
+//					intent.putExtra("MonthKey", "");
+//					try
+//					{
+//						Log.i("RowNumber", marker.getTitle().trim());
+//						intent.putExtra("RowNumber", Integer.valueOf(marker.getTitle().trim()));
+//					} catch (Exception e)
+//					{
+//						Toast.makeText(MainActivity.this, "marker error", Toast.LENGTH_SHORT).show();
+//						intent.putExtra("RowNumber", 1);
+//					}
+//
+//					intent.setClass(MainActivity.this, DetailActivity.class);
+//					startActivity(intent);
+//					return true;
+//				}
+//			});
 
 			if (NetworkUtil.getConnectivityStatus(MainActivity.this) == 0)
 			{
-				AlertDialog.Builder dialog = new AlertDialog.Builder(
-						MainActivity.this);
+				AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
 				dialog.setTitle("無網路");
 				dialog.setMessage("偵測不到網路");
-				dialog.setPositiveButton("確定",
-						new DialogInterface.OnClickListener()
-						{
-							public void onClick(
-									DialogInterface dialoginterface, int i)
-							{
-								getLocation(true, 0);
-							}
-						});
+				dialog.setPositiveButton("確定", new DialogInterface.OnClickListener()
+				{
+					public void onClick(DialogInterface dialoginterface, int i)
+					{
+						getLocation(true, 0);
+					}
+				});
 				dialog.show();
 			} else
 			{
@@ -1122,49 +1047,40 @@ public class MainActivity extends FragmentActivity implements
 				// TODO: handle exception
 			}
 
-			String hpMinString = Setting.getSetting(Setting.keyHousePriceMin,
-					MainActivity.this);
+			String hpMinString = Setting.getSetting(Setting.keyHousePriceMin, MainActivity.this);
 			if (hpMinString.equals("0"))
 			{
 				hpMinString = null;
 			}
-			String hpMaxString = Setting.getSetting(Setting.keyHousePriceMax,
-					MainActivity.this);
+			String hpMaxString = Setting.getSetting(Setting.keyHousePriceMax, MainActivity.this);
 			if (hpMaxString.equals("0"))
 			{
 				hpMaxString = null;
 			}
-			String areaMinString = Setting.getSetting(Setting.keyAreaMin,
-					MainActivity.this);
+			String areaMinString = Setting.getSetting(Setting.keyAreaMin, MainActivity.this);
 			if (areaMinString.equals("0"))
 			{
 				areaMinString = null;
 			}
-			String areaMaxString = Setting.getSetting(Setting.keyAreaMax,
-					MainActivity.this);
+			String areaMaxString = Setting.getSetting(Setting.keyAreaMax, MainActivity.this);
 			if (areaMaxString.equals("0"))
 			{
 				areaMaxString = null;
 			}
-			String groundTypeString = Setting.getSetting(Setting.keyGroundType,
-					MainActivity.this);
+			String groundTypeString = Setting.getSetting(Setting.keyGroundType, MainActivity.this);
 			if (groundTypeString.equals("0"))
 			{
 				groundTypeString = null;
 			}
-			String buildingTypeString = Setting.getSetting(
-					Setting.keyBuildingType, MainActivity.this);
+			String buildingTypeString = Setting.getSetting(Setting.keyBuildingType, MainActivity.this);
 			if (buildingTypeString.equals("0"))
 			{
 				buildingTypeString = null;
 			}
 
-			Datas.mEstates = HouseApi.getAroundAllByAreas(AppConstants.km_dis,
-					AppConstants.currentLatLng.longitude,
-					AppConstants.currentLatLng.latitude,
-					AppConstants.startDate, AppConstants.endDate, hpMinString,
-					hpMaxString, areaMinString, areaMaxString,
-					groundTypeString, buildingTypeString);
+			Datas.mEstates = HouseApi.getAroundAllByAreas(AppConstants.km_dis, AppConstants.currentLatLng.longitude,
+					AppConstants.currentLatLng.latitude, AppConstants.startDate, AppConstants.endDate, hpMinString,
+					hpMaxString, areaMinString, areaMaxString, groundTypeString, buildingTypeString);
 
 			return null;
 		}
@@ -1192,17 +1108,16 @@ public class MainActivity extends FragmentActivity implements
 				// }
 
 			} else
-			{	
+			{
 				Datas.mEstates = new ArrayList<RealEstate>();
 				mPage = 0;
 
 				Datas.mEstatesMap = getRealEstatesMap(Datas.mEstates);
 				setTitleText(mPage);
-				
+
 				new addMarkerTask().execute();
-				
-				Toast.makeText(MainActivity.this, "無資料~", Toast.LENGTH_SHORT)
-						.show();
+
+				Toast.makeText(MainActivity.this, "無資料~", Toast.LENGTH_SHORT).show();
 				titleTextView.setText("無資料~");
 			}
 
@@ -1210,8 +1125,7 @@ public class MainActivity extends FragmentActivity implements
 
 	}
 
-	private TreeMap<String, ArrayList<RealEstate>> getRealEstatesMap(
-			ArrayList<RealEstate> realEstates)
+	private TreeMap<String, ArrayList<RealEstate>> getRealEstatesMap(ArrayList<RealEstate> realEstates)
 	{
 
 		TreeMap<String, ArrayList<RealEstate>> estateMap = new TreeMap<String, ArrayList<RealEstate>>();
@@ -1223,13 +1137,11 @@ public class MainActivity extends FragmentActivity implements
 			if (estateMap.containsKey(realEstateKey))
 			{
 				// 已經有的話就把movie加進去
-				((ArrayList<RealEstate>) estateMap.get(realEstateKey))
-						.add(realEstate);
+				((ArrayList<RealEstate>) estateMap.get(realEstateKey)).add(realEstate);
 			} else
 			{
 				// 沒有的話就建一個加進去
-				ArrayList<RealEstate> newRealEstateList = new ArrayList<RealEstate>(
-						10);
+				ArrayList<RealEstate> newRealEstateList = new ArrayList<RealEstate>(10);
 				newRealEstateList.add(realEstate);
 				estateMap.put(realEstateKey, newRealEstateList);
 			}
@@ -1268,8 +1180,7 @@ public class MainActivity extends FragmentActivity implements
 			initialNum = (num / 100) * 100 + 1;
 		}
 
-		titleTextView.setText("顯示" + Integer.toString(initialNum) + "~"
-				+ Integer.toString(num) + "/"
+		titleTextView.setText("顯示" + Integer.toString(initialNum) + "~" + Integer.toString(num) + "/"
 				+ Integer.toString(Datas.mEstates.size()) + "筆");
 
 	}
@@ -1295,12 +1206,9 @@ public class MainActivity extends FragmentActivity implements
 
 		for (int i = initialNum - 1; i < num - 1; i++)
 		{
-			LatLng newLatLng = new LatLng(Datas.mEstates.get(i).y_lat,
-					Datas.mEstates.get(i).x_long);
-			MarkerOptions marker = new MarkerOptions().position(newLatLng)
-					.title(Integer.toString(i));
-			marker.icon(BitmapDescriptorFactory
-					.fromResource(R.drawable.marker_sale));
+			LatLng newLatLng = new LatLng(Datas.mEstates.get(i).y_lat, Datas.mEstates.get(i).x_long);
+			MarkerOptions marker = new MarkerOptions().position(newLatLng).title(Integer.toString(i));
+			marker.icon(BitmapDescriptorFactory.fromResource(R.drawable.marker_sale));
 			mGoogleMap.addMarker(marker);
 		}
 
@@ -1385,23 +1293,17 @@ public class MainActivity extends FragmentActivity implements
 
 		for (int i = initialNum - 1; i < num - 1; i++)
 		{
-			LatLng newLatLng = new LatLng(Datas.mEstates.get(i).y_lat,
-					Datas.mEstates.get(i).x_long);
+			LatLng newLatLng = new LatLng(Datas.mEstates.get(i).y_lat, Datas.mEstates.get(i).x_long);
 
 			View layout = inflater.inflate(R.layout.item_marker, null);
-			layout.setLayoutParams(new LinearLayout.LayoutParams(
-					LinearLayout.LayoutParams.WRAP_CONTENT,
+			layout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
 					LinearLayout.LayoutParams.WRAP_CONTENT));
-			ImageView markerView = (ImageView) layout
-					.findViewById(R.id.image_marker);
-			TextView markerText = (TextView) layout
-					.findViewById(R.id.text_marker_price);
+			ImageView markerView = (ImageView) layout.findViewById(R.id.image_marker);
+			TextView markerText = (TextView) layout.findViewById(R.id.text_marker_price);
 
 			// for later marker info window use
-			MarkerOptions marker = new MarkerOptions().position(newLatLng)
-					.title(Integer.toString(i));
-			markerText
-					.setText(Double.toString(Datas.mEstates.get(i).square_price));
+			MarkerOptions marker = new MarkerOptions().position(newLatLng).title(Integer.toString(i));
+			markerText.setText(Double.toString(Datas.mEstates.get(i).square_price));
 
 			markerView.setImageResource(R.drawable.marker_sale);
 
@@ -1462,16 +1364,14 @@ public class MainActivity extends FragmentActivity implements
 		if (v.getMeasuredHeight() <= 0)
 		{
 			v.measure(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-			Bitmap b = Bitmap.createBitmap(v.getMeasuredWidth(),
-					v.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+			Bitmap b = Bitmap.createBitmap(v.getMeasuredWidth(), v.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
 			Canvas c = new Canvas(b);
 			v.layout(0, 0, v.getMeasuredWidth(), v.getMeasuredHeight());
 			v.draw(c);
 			return b;
 		}
 
-		Bitmap b = Bitmap.createBitmap(v.getLayoutParams().width,
-				v.getLayoutParams().height, Bitmap.Config.ARGB_8888);
+		Bitmap b = Bitmap.createBitmap(v.getLayoutParams().width, v.getLayoutParams().height, Bitmap.Config.ARGB_8888);
 		Canvas c = new Canvas(b);
 		v.layout(v.getLeft(), v.getTop(), v.getRight(), v.getBottom());
 		v.draw(c);
@@ -1482,8 +1382,7 @@ public class MainActivity extends FragmentActivity implements
 	{
 
 		// Check that Google Play services is available
-		int resultCode = GooglePlayServicesUtil
-				.isGooglePlayServicesAvailable(this);
+		int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
 
 		// If Google Play services is available
 		if (ConnectionResult.SUCCESS == resultCode)
@@ -1497,14 +1396,12 @@ public class MainActivity extends FragmentActivity implements
 		} else
 		{
 			// Display an error dialog
-			Dialog dialog = GooglePlayServicesUtil.getErrorDialog(resultCode,
-					this, 0);
+			Dialog dialog = GooglePlayServicesUtil.getErrorDialog(resultCode, this, 0);
 			if (dialog != null)
 			{
 				ErrorDialogFragment errorFragment = new ErrorDialogFragment();
 				errorFragment.setDialog(dialog);
-				errorFragment.show(getSupportFragmentManager(),
-						LocationUtils.APPTAG);
+				errorFragment.show(getSupportFragmentManager(), LocationUtils.APPTAG);
 			}
 			return false;
 		}
@@ -1514,10 +1411,8 @@ public class MainActivity extends FragmentActivity implements
 	{
 		// TODO Auto-generated method stub
 		mGoogleMap.clear();
-		loacationMarker = new MarkerOptions().position(
-				AppConstants.currentLatLng).draggable(true);
-		loacationMarker.icon(BitmapDescriptorFactory
-				.fromResource(R.drawable.pin_red));
+		loacationMarker = new MarkerOptions().position(AppConstants.currentLatLng).draggable(true);
+		loacationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.pin_red));
 		mGoogleMap.addMarker(loacationMarker);
 	}
 
@@ -1563,8 +1458,9 @@ public class MainActivity extends FragmentActivity implements
 		items.add(new SectionItem("實價登錄搜尋"));
 		items.add(new EntryItem("位置附近", R.drawable.icon_access_location));
 		items.add(new EntryItem("條件篩選", R.drawable.icon_filter));
-		items.add(new SectionItem("房貸計算"));
+		items.add(new SectionItem("房貸"));
 		items.add(new EntryItem("房貸計算機", R.drawable.icon_calculator));
+		items.add(new EntryItem("房貸咨詢", R.drawable.icon_money));
 		items.add(new SectionItem("其他"));
 		items.add(new EntryItem("推薦", R.drawable.icon_recommend));
 		items.add(new EntryItem("給評(星星)", R.drawable.icon_star3));
@@ -1574,8 +1470,7 @@ public class MainActivity extends FragmentActivity implements
 		mDrawerListView.setAdapter(mDrawerAdapter);
 		mDrawerListView.setOnItemClickListener((new OnItemClickListener()
 		{
-			public void onItemClick(AdapterView<?> parent, View v,
-					int position, long id)
+			public void onItemClick(AdapterView<?> parent, View v, int position, long id)
 			{
 				if (!items.get(position).isSection())
 				{
@@ -1584,73 +1479,75 @@ public class MainActivity extends FragmentActivity implements
 					switch (position)
 					{
 					case 1:
-						EasyTracker easyTracker = EasyTracker
-								.getInstance(MainActivity.this);
-						easyTracker.send(MapBuilder.createEvent("Button",
-								"button_press", "focus_button2", null).build());
+						EasyTracker easyTracker = EasyTracker.getInstance(MainActivity.this);
+						easyTracker.send(MapBuilder.createEvent("Button", "button_press", "focus_button2", null)
+								.build());
 						getLocation(true, 1);
 						mDrawerLayout.closeDrawer(leftDrawer);
 						break;
 					case 2:
-						EasyTracker easyTracker2 = EasyTracker
-								.getInstance(MainActivity.this);
-						easyTracker2
-								.send(MapBuilder.createEvent("Button",
-										"button_press", "filter_button2", null)
-										.build());
+						EasyTracker easyTracker2 = EasyTracker.getInstance(MainActivity.this);
+						easyTracker2.send(MapBuilder.createEvent("Button", "button_press", "filter_button2", null)
+								.build());
 						Intent intent = new Intent();
 						intent.setClass(MainActivity.this, FilterActivity.class);
 						startActivity(intent);
 						mDrawerLayout.closeDrawer(leftDrawer);
 						break;
 					case 4:
-						EasyTracker easyTracker3 = EasyTracker
-								.getInstance(MainActivity.this);
-						easyTracker3.send(MapBuilder.createEvent("Button",
-								"button_press", "calculator_button", null)
+						EasyTracker easyTracker3 = EasyTracker.getInstance(MainActivity.this);
+						easyTracker3.send(MapBuilder.createEvent("Button", "button_press", "calculator_button", null)
 								.build());
 
-						Intent intent2 = new Intent(MainActivity.this,
-								CalculatorActivity.class);
+						Intent intent2 = new Intent(MainActivity.this, CalculatorActivity.class);
 						startActivity(intent2);
 						mDrawerLayout.closeDrawer(leftDrawer);
 						break;
-					case 6:
+					case 5:
+						EasyTracker easyTrackerMoney = EasyTracker.getInstance(MainActivity.this);
+						easyTrackerMoney.send(MapBuilder.createEvent("Button", "button_press", "loan_money_button",
+								null).build());
+
+//						Intent intentMoney = new Intent(MainActivity.this, LoanAdviseActivity.class);
+//						startActivity(intentMoney);
+						
+						Uri loanUri =Uri.parse("http://www.e-loan.com.tw");
+		                Intent i=new Intent(Intent.ACTION_VIEW,loanUri);
+		                startActivity(i);
+						
+						mDrawerLayout.closeDrawer(leftDrawer);
+						break;
+					case 7:
 						Intent intent3 = new Intent(Intent.ACTION_SEND);
 						intent3.setType("text/plain");
 						intent3.putExtra(Intent.EXTRA_TEXT,
 								"看屋高手 https://play.google.com/store/apps/details?id=com.kosbrother.houseprice");
 						startActivity(Intent.createChooser(intent3, "Share..."));
 
-						EasyTracker easyTracker4 = EasyTracker
-								.getInstance(MainActivity.this);
-						easyTracker4.send(MapBuilder.createEvent("Button",
-								"button_press", "share_button", null).build());
-						break;
-					case 7:
-						EasyTracker easyTracker5 = EasyTracker
-								.getInstance(MainActivity.this);
-						easyTracker5.send(MapBuilder.createEvent("Button",
-								"button_press", "star_button", null).build());
-
-						Uri uri = Uri
-								.parse("https://play.google.com/store/apps/details?id=com.kosbrother.houseprice");
-						Intent it = new Intent(Intent.ACTION_VIEW, uri);
-						startActivity(it);
-						Setting.saveBooleanSetting(Setting.KeyGiveStar, true,
-								MainActivity.this);
-						Setting.saveBooleanSetting(Setting.KeyPushStarDialog,
-								false, MainActivity.this);
+						EasyTracker easyTracker4 = EasyTracker.getInstance(MainActivity.this);
+						easyTracker4.send(MapBuilder.createEvent("Button", "button_press", "share_button", null)
+								.build());
 						break;
 					case 8:
-						// about us
-						EasyTracker easyTracker6 = EasyTracker
-								.getInstance(MainActivity.this);
-						easyTracker6.send(MapBuilder.createEvent("Button",
-								"button_press", "about_button", null).build());
+						EasyTracker easyTracker5 = EasyTracker.getInstance(MainActivity.this);
+						easyTracker5
+								.send(MapBuilder.createEvent("Button", "button_press", "star_button", null).build());
 
-						Intent intent5 = new Intent(MainActivity.this,
-								AboutUsActivity.class);
+						Uri uri = Uri.parse("https://play.google.com/store/apps/details?id=com.kosbrother.houseprice");
+						Intent it = new Intent(Intent.ACTION_VIEW, uri);
+						startActivity(it);
+						// Setting.saveBooleanSetting(Setting.KeyGiveStar, true,
+						// MainActivity.this);
+						// Setting.saveBooleanSetting(Setting.KeyPushStarDialog,
+						// false, MainActivity.this);
+						break;
+					case 9:
+						// about us
+						EasyTracker easyTracker6 = EasyTracker.getInstance(MainActivity.this);
+						easyTracker6.send(MapBuilder.createEvent("Button", "button_press", "about_button", null)
+								.build());
+
+						Intent intent5 = new Intent(MainActivity.this, AboutUsActivity.class);
 						startActivity(intent5);
 						break;
 					default:
@@ -1663,8 +1560,7 @@ public class MainActivity extends FragmentActivity implements
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(
-			MenuItem item)
+	public boolean onOptionsItemSelected(MenuItem item)
 	{
 		if (mDrawerToggle.onOptionsItemSelected(getMenuItem(item)))
 		{
@@ -1813,8 +1709,7 @@ public class MainActivity extends FragmentActivity implements
 			}
 
 			@Override
-			public android.view.MenuItem setActionProvider(
-					ActionProvider actionProvider)
+			public android.view.MenuItem setActionProvider(ActionProvider actionProvider)
 			{
 				return null;
 			}
@@ -1883,22 +1778,19 @@ public class MainActivity extends FragmentActivity implements
 			}
 
 			@Override
-			public android.view.MenuItem setOnActionExpandListener(
-					OnActionExpandListener listener)
+			public android.view.MenuItem setOnActionExpandListener(OnActionExpandListener listener)
 			{
 				return null;
 			}
 
 			@Override
-			public android.view.MenuItem setOnMenuItemClickListener(
-					OnMenuItemClickListener menuItemClickListener)
+			public android.view.MenuItem setOnMenuItemClickListener(OnMenuItemClickListener menuItemClickListener)
 			{
 				return null;
 			}
 
 			@Override
-			public android.view.MenuItem setShortcut(char numericChar,
-					char alphaChar)
+			public android.view.MenuItem setShortcut(char numericChar, char alphaChar)
 			{
 				return null;
 			}
@@ -1991,151 +1883,139 @@ public class MainActivity extends FragmentActivity implements
 	@Override
 	public void onBackPressed()
 	{
-		boolean isShowGiveStarDialog = Setting.getBooleanSetting(
-				Setting.KeyPushStarDialog, MainActivity.this);
-		if (isShowGiveStarDialog)
-		{
-			AlertDialog.Builder dialog = new AlertDialog.Builder(
-					MainActivity.this);
-
-			dialog.setTitle("給星星");
-			dialog.setMessage("您的五星評價是加速我們改進產品的動力，針對早期用戶, 我們會去廣告回饋喔~");
-			dialog.setPositiveButton("給星星",
-					new DialogInterface.OnClickListener()
-					{
-						public void onClick(DialogInterface dialoginterface,
-								int i)
-						{
-							Uri uri = Uri
-									.parse("https://play.google.com/store/apps/details?id=com.kosbrother.houseprice");
-							Intent it = new Intent(Intent.ACTION_VIEW, uri);
-							startActivity(it);
-							Setting.saveBooleanSetting(Setting.KeyGiveStar,
-									true, MainActivity.this);
-							Setting.saveBooleanSetting(
-									Setting.KeyPushStarDialog, false,
-									MainActivity.this);
-						}
-					});
-			dialog.setNeutralButton("稍後提醒",
-					new DialogInterface.OnClickListener()
-					{
-						public void onClick(DialogInterface dialoginterface,
-								int i)
-						{
-							// do nothing
-							finish();
-							isReSearch = true;
-						}
-					});
-
-			dialog.setNegativeButton("不再提醒",
-					new DialogInterface.OnClickListener()
-					{
-						public void onClick(DialogInterface dialoginterface,
-								int i)
-						{
-							Setting.saveBooleanSetting(
-									Setting.KeyPushStarDialog, false,
-									MainActivity.this);
-							finish();
-							isReSearch = true;
-						}
-					});
-
-			dialog.show();
-
-		} else
-		{
-			super.onBackPressed();
-			isReSearch = true;
-		}
+		// boolean isShowGiveStarDialog = Setting.getBooleanSetting(
+		// Setting.KeyPushStarDialog, MainActivity.this);
+		// if (isShowGiveStarDialog)
+		// {
+		// AlertDialog.Builder dialog = new AlertDialog.Builder(
+		// MainActivity.this);
+		//
+		// dialog.setTitle("給星星");
+		// dialog.setMessage("您的五星評價是加速我們改進產品的動力，針對早期用戶, 我們會去廣告回饋喔~");
+		// dialog.setPositiveButton("給星星",
+		// new DialogInterface.OnClickListener()
+		// {
+		// public void onClick(DialogInterface dialoginterface,
+		// int i)
+		// {
+		// Uri uri = Uri
+		// .parse("https://play.google.com/store/apps/details?id=com.kosbrother.houseprice");
+		// Intent it = new Intent(Intent.ACTION_VIEW, uri);
+		// startActivity(it);
+		// Setting.saveBooleanSetting(Setting.KeyGiveStar,
+		// true, MainActivity.this);
+		// Setting.saveBooleanSetting(
+		// Setting.KeyPushStarDialog, false,
+		// MainActivity.this);
+		// }
+		// });
+		// dialog.setNeutralButton("稍後提醒",
+		// new DialogInterface.OnClickListener()
+		// {
+		// public void onClick(DialogInterface dialoginterface,
+		// int i)
+		// {
+		// // do nothing
+		// finish();
+		// isReSearch = true;
+		// }
+		// });
+		//
+		// dialog.setNegativeButton("不再提醒",
+		// new DialogInterface.OnClickListener()
+		// {
+		// public void onClick(DialogInterface dialoginterface,
+		// int i)
+		// {
+		// Setting.saveBooleanSetting(
+		// Setting.KeyPushStarDialog, false,
+		// MainActivity.this);
+		// finish();
+		// isReSearch = true;
+		// }
+		// });
+		//
+		// dialog.show();
+		//
+		// } else
+		// {
+		super.onBackPressed();
+		isReSearch = true;
+		// }
 
 	}
 
 	private void showSelectDistanceDialog()
 	{
 
-		AlertDialog.Builder editDialog = new AlertDialog.Builder(
-				MainActivity.this);
+		AlertDialog.Builder editDialog = new AlertDialog.Builder(MainActivity.this);
 		editDialog.setTitle("選取搜索範圍");
 
 		// final EditText editText = new EditText(ArticleActivity.this);
 		// editDialog.setView(editText);
 
 		LayoutInflater inflater = LayoutInflater.from(MainActivity.this);
-		View distance_view = inflater.inflate(R.layout.dialog_select_distance,
-				null);
-		final TextView textDistance = (TextView) distance_view
-				.findViewById(R.id.text_distance);
-		SeekBar seekBarDistance = (SeekBar) distance_view
-				.findViewById(R.id.seekbar_distance);
+		View distance_view = inflater.inflate(R.layout.dialog_select_distance, null);
+		final TextView textDistance = (TextView) distance_view.findViewById(R.id.text_distance);
+		SeekBar seekBarDistance = (SeekBar) distance_view.findViewById(R.id.seekbar_distance);
 
 		textDistance.setText(Double.toString(AppConstants.km_dis) + "km");
 		int pp = (int) (AppConstants.km_dis / 0.03);
 		seekBarDistance.setProgress(pp);
 
-		seekBarDistance
-				.setOnSeekBarChangeListener(new OnSeekBarChangeListener()
-				{
+		seekBarDistance.setOnSeekBarChangeListener(new OnSeekBarChangeListener()
+		{
 
-					@Override
-					public void onStopTrackingTouch(SeekBar seekBar)
-					{
-						// TODO Auto-generated method stub
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar)
+			{
+				// TODO Auto-generated method stub
 
-					}
+			}
 
-					@Override
-					public void onStartTrackingTouch(SeekBar seekBar)
-					{
-						// TODO Auto-generated method stub
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar)
+			{
+				// TODO Auto-generated method stub
 
-					}
+			}
 
-					@Override
-					public void onProgressChanged(SeekBar seekBar,
-							int progress, boolean fromUser)
-					{
-						// TODO Auto-generated method stub
-						double d = progress * 0.03;
-						String d_String = Double.toString(d).substring(0, 3);
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser)
+			{
+				// TODO Auto-generated method stub
+				double d = progress * 0.03;
+				String d_String = Double.toString(d).substring(0, 3);
 
-						textDistance.setText(d_String + "km");
-						AppConstants.km_dis = Double.valueOf(d_String);
-					}
-				});
+				textDistance.setText(d_String + "km");
+				AppConstants.km_dis = Double.valueOf(d_String);
+			}
+		});
 
 		editDialog.setView(distance_view);
 
-		editDialog.setPositiveButton("確定",
-				new DialogInterface.OnClickListener()
+		editDialog.setPositiveButton("確定", new DialogInterface.OnClickListener()
+		{
+			public void onClick(DialogInterface arg0, int arg1)
+			{
+				if (AppConstants.km_dis != 0)
 				{
-					public void onClick(DialogInterface arg0, int arg1)
-					{
-						if (AppConstants.km_dis != 0)
-						{
-							distanceButton.setText(Double
-									.toString(AppConstants.km_dis) + "km");
-							Setting.saveSetting(Setting.keyKmDistance,
-									Double.toString(AppConstants.km_dis),
-									MainActivity.this);
-							getLocation(false, 0);
-						} else
-						{
-							Toast.makeText(MainActivity.this, "半徑不能為0",
-									Toast.LENGTH_SHORT).show();
-						}
+					distanceButton.setText(Double.toString(AppConstants.km_dis) + "km");
+					Setting.saveSetting(Setting.keyKmDistance, Double.toString(AppConstants.km_dis), MainActivity.this);
+					getLocation(false, 0);
+				} else
+				{
+					Toast.makeText(MainActivity.this, "半徑不能為0", Toast.LENGTH_SHORT).show();
+				}
 
-					}
-				});
-		editDialog.setNegativeButton("取消",
-				new DialogInterface.OnClickListener()
-				{
-					public void onClick(DialogInterface arg0, int arg1)
-					{
-					}
-				});
+			}
+		});
+		editDialog.setNegativeButton("取消", new DialogInterface.OnClickListener()
+		{
+			public void onClick(DialogInterface arg0, int arg1)
+			{
+			}
+		});
 		editDialog.show();
 	}
 
@@ -2151,44 +2031,36 @@ public class MainActivity extends FragmentActivity implements
 
 	private void CallAds()
 	{
-		boolean isGivenStar = Setting.getBooleanSetting(Setting.KeyGiveStar,
-				MainActivity.this);
+		boolean isGivenStar = Setting.getBooleanSetting(Setting.KeyGiveStar, MainActivity.this);
 
 		if (!isGivenStar)
 		{
-			adBannerLayout = (RelativeLayout) findViewById(R.id.adLayout);
+				
+			interstitial = new InterstitialAd(this);
+		    interstitial.setAdUnitId(AppConstants.MEDIATION_KEY);
 
-			final AdRequest adReq = new AdRequest.Builder().build();
+		    // Create ad request.
+		    AdRequest adRequest = new AdRequest.Builder().build();
 
-			// 12-18 17:01:12.438: I/Ads(8252): Use
-			// AdRequest.Builder.addTestDevice("A25819A64B56C65500038B8A9E7C19DD")
-			// to get test ads on this device.
-
-			adMobAdView = new AdView(MainActivity.this);
-			adMobAdView.setAdSize(AdSize.SMART_BANNER);
-			adMobAdView.setAdUnitId(AppConstants.MEDIATION_KEY);
-
-			adMobAdView.loadAd(adReq);
-			adMobAdView.setAdListener(new AdListener()
+		    // Begin loading your interstitial.
+		    interstitial.loadAd(adRequest);
+		    interstitial.setAdListener(new AdListener()
 			{
 				@Override
 				public void onAdLoaded()
 				{
-					adBannerLayout.setVisibility(View.VISIBLE);
-					if (adBannerLayout.getChildAt(0) != null)
-					{
-						adBannerLayout.removeViewAt(0);
-					}
-					adBannerLayout.addView(adMobAdView);
+					interstitial.show();
 				}
-
+	
 				public void onAdFailedToLoad(int errorCode)
 				{
-					adBannerLayout.setVisibility(View.GONE);
+					
 				}
 
 			});
+		    
 		}
 	}
+	
 
 }

@@ -11,5 +11,6 @@
 
     <!-- Latitude, longitude format -->
     <string name="latitude_longitude">%1$.8f, %2$.8f</string>
-
+	
+    <string name="spinner_prompt">選擇居住地區</string>
 </resources>

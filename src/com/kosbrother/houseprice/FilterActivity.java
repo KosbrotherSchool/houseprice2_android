@@ -330,7 +330,7 @@ public class FilterActivity extends FragmentActivity
 				// max square price
 				if (areaMaxEditText.getText().toString().equals(""))
 				{
-					Setting.saveSetting(Setting.keyAreaMin,
+					Setting.saveSetting(Setting.keyAreaMax,
 							Setting.initialAreaMax, FilterActivity.this);
 				} else
 				{
